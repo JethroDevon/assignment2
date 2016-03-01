@@ -34,8 +34,13 @@ class Splash: public Sprites{
         //resets window to set sizes
         void returnWindow(int, int, std::string);
 
+        //returns true if the delay to show the next frame has been long enough, sould be 0.6 of a second
+        bool frameTime();
+
         //object to refere to window passed into args with
         sf::RenderWindow &splashWin;
+
+        std::clock_t startTime;
 
     private:
 

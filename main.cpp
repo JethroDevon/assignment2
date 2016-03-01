@@ -13,10 +13,10 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(800, 600), "", false);
 
     //splash uses the window for the splash screen display
-    Splash splash(window, "media/XD.png", 4, 4, 2);
+    Splash splash(window, "media/spaceman.png", 4, 8, 2);
 
     //function in splash can return window to desired size after, should make that auto-matic
-    splash.returnWindow(800 , 600, "NetClient");
+    splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
 
     textOut textBox(20, 20, 600, 400, 20, window);
 

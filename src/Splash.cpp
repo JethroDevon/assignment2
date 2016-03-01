@@ -17,6 +17,9 @@ Splash::Splash(sf::RenderWindow & _win, std::string _path, int _row, int _col, d
 
 	splashWin.setView(sf::View(sf::FloatRect(0.f, 0.f, size.x, size.y)));
 
+    //updates time passed since program started                                                        
+    startTime = std::clock();
+
 	//call draw splash screen
     runSplash(_runTime);
 }
@@ -54,7 +57,15 @@ void Splash::runSplash(double _time){
         }
 
         splashWin.clear();
-        splashWin.draw(getNext());
+
+        if(frameTime()){
+
+            splashWin.draw(getNext());
+        }else{
+
+             splashWin.draw(showFrame());
+        }
+
         splashWin.display();
     }
 }
@@ -68,6 +79,8 @@ void Splash::runSplash(){
         splashWin.clear();
         splashWin.draw(getNext());
         splashWin.display();
+
+        getTicks(1);
     }
 }
 
@@ -87,4 +100,18 @@ bool Splash::splashAlive(){
 void Splash::splashKill(){
 
     splashRunning = false;
+}
+
+bool Splash::frameTime(){
+
+    //updates ticks and returns true if time in args has passed
+    if(((std::clock() - startTime) /(double) CLOCKS_PER_SEC) > 0.06){
+
+        startTime = std::clock();
+        return true;
+    //returns false if time has not passed
+    }else{
+
+        return false;
+    }
 }

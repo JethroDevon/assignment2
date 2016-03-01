@@ -41,22 +41,24 @@ void sockWrapper::serverListen(unsigned short _port){
 
 void sockWrapper::send( std::string _message){
 
-    socket.send(_message.c_str(), _message.size() + 1);
+    socket.send( _message.c_str(), _message.size() + 1);
 }
 
 void sockWrapper::recieve(){
+
+    mutex.lock();
 
     char data[1000];
     std::size_t received = 0;
 
     // TCP socket:
-    if (socket.receive(data, 99, received) == sf::Socket::Done){
+    if (socket.receive(data, 2000, received) == sf::Socket::Done){
 
-        std::string mow = std::string (data);
-
-        messageStack.push(mow);
-        std::cout<< mow << std::endl;
+        messageStack.push(" " + received);
+        std::cout<< data << std::endl;
     }
+    
+     mutex.unlock();
 }
 
 //returns size of message stack
