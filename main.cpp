@@ -30,10 +30,10 @@ int main(){
     Connection connection(1000);
 
     //add a socket for the connection to handle
-    connection.addSocket("irc", "irc.freenode.net", 6666);
+    connection.addSocket("irc", "chat.freenode.net", 6666);
 
-    connection.sendTo("irc", "NICK othername\r\n");
-    connection.sendTo("irc", "USER jesus 8 *: j c\r\n");
+    connection.sendTo("irc", "NICK devonrevenge\r\n");
+    connection.sendTo("irc", "USER woop 8 *: woop\r\n");
     connection.sendTo("irc", "");
     connection.sendTo("irc", "");
     connection.sendTo("irc", "");
@@ -74,8 +74,10 @@ int main(){
             }
         }
 
+        connection.poll("irc");
+
         //refreshes background
-        window.clear(sf::Color::White);
+        window.clear(sf::Color::Black);
 
         textField.drawText();
         textBox.drawBox();

@@ -44,6 +44,8 @@ class Connection{
         //kills connection with same name as args
         void killConnection(std::string);
 
+        void poll(std::string);
+
     private:
 
         //pings a connection and sets pinged timer/flag to true

@@ -41,24 +41,25 @@ void sockWrapper::serverListen(unsigned short _port){
 
 void sockWrapper::send( std::string _message){
 
-    socket.send( _message.c_str(), _message.size() + 1);
+    socket.send( _message.c_str(), sizeof(_message.c_str()));
 }
 
 void sockWrapper::recieve(){
-
-    mutex.lock();
 
     char data[1000];
     std::size_t received = 0;
 
     // TCP socket:
-    if (socket.receive(data, 2000, received) == sf::Socket::Done){
+    if(socket.receive(data, 1000, received) == sf::Socket::Done){
 
-        messageStack.push(" " + received);
-        std::cout<< data << std::endl;
+        data[received] = '\0';
+
+        std::string temp;
+        temp = ((std::string) data).substr( 0, received);
+        temp += '\0';
+       // messageStack.push(temp);
+        std::cout<< temp + ":P" << std::endl;       
     }
-    
-     mutex.unlock();
 }
 
 //returns size of message stack
@@ -141,26 +142,26 @@ void sockWrapper::closeSocket(){
 
 void sockWrapper::runConnection(){
 
-    while(getAlive()){
 
-        //mutex lock to avoid waste-full spinning
-        mutex.lock();
+    //mutex lock to avoid waste-full spinning
+    mutex.lock();
 
-        if(getToSend()){
+    if(getToSend()){
 
-            send(postMessage());
+        send(postMessage());
 
-            messageStack.push(message);
+        //messageStack.push( getName() + ": " + message);
+        std::cout << getName() + ": " + message<<std::endl;
 
-            //sets message back to ""
-            message = "";
+        //sets message back to ""
+        message = "";
 
-            //sets flag to post something back to false
-            toSend = false;
+        //sets flag to post something back to false
+        setToSend(false);
     }
+
+    sf::sleep(sf::milliseconds(1));
 
     recieve();
-
-    mutex.unlock();
-    }
 }
+ 

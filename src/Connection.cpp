@@ -14,7 +14,7 @@ Connection::~Connection(){
 //this function uses the first string args to find the connection to send the message in  string args2
 void Connection::sendTo(std::string _name, std::string _message){
 
-    for(auto socks: socketConnections){
+    for(auto &socks: socketConnections){
 
         if(socks->getName().compare( _name) == 0){
 
@@ -30,7 +30,7 @@ void Connection::sendTo(std::string _name, std::string _message){
 //returns the most recently received message in the top of the stack for the connection named as the same as in args
 std::string Connection::recieveFrom(std::string _name){
 
-     for(auto socks: socketConnections){
+     for(auto &socks: socketConnections){
 
         if(socks->getName().compare( _name) == 0){
 
@@ -47,7 +47,7 @@ std::string Connection::recieveFrom(std::string _name){
 //kills connection with same name as args
 void Connection::killConnection(std::string _name){
 
-    for(auto socks: socketConnections){
+    for(auto &socks: socketConnections){
 
         if(socks->getName().compare( _name) == 0){
 
@@ -62,7 +62,7 @@ void Connection::killConnection(std::string _name){
 //if connection with matching name to string in args has data will return true
 bool Connection::dataAvailable(std::string _name){
 
-     for(auto socks: socketConnections){
+     for(auto &socks: socketConnections){
 
         if(socks->getName().compare( _name) == 0){
 
@@ -117,9 +117,20 @@ void Connection::addSocket(std::string _name, std::string _ip, unsigned short _p
 
     //connect the socket to the server
     socketConnections.back()->connect();
-
-    //run the socket in its own thread
-    socketConnections.back()->run.launch();
 }
+
+//adds client socket in args to vector
+void Connection::poll(std::string _name){
+
+      for(auto &socks: socketConnections){
+
+        if(socks->getName().compare( _name) == 0){
+          
+            //connect the socket to the server
+            socketConnections.back()->runConnection();
+        }
+    }
+}
+
 
 
