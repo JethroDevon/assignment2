@@ -1,16 +1,8 @@
 #include "sockWrapper.h"
 #include <iostream>
 
-//TCP server socket constructor, first initialiser list arg is directly initialising thread as it cannot have a default constructor
-sockWrapper::sockWrapper(std::string _serverName, unsigned short _port):  run(&sockWrapper::runConnection, this), connectionName( _serverName), port( _port){
-
-    isAlive = false;
-    toSend = false;
-    socket.setBlocking(false);
-}
-
 //TCP client constructor, first initialiser list arg is directly initialising thread as it cannot have a default constructor
-sockWrapper::sockWrapper(std::string _clientName, std::string _ipAddress, unsigned short _port): run(&sockWrapper::runConnection, this), connectionName( _clientName), IP( _ipAddress), port ( _port){
+sockWrapper::sockWrapper(std::string _clientName, std::string _ipAddress, unsigned short _port): run( &sockWrapper::runConnection, this), connectionName( _clientName), IP( _ipAddress), port ( _port){
 
     isAlive = false;
     toSend = false;
@@ -26,39 +18,28 @@ std::string sockWrapper::getName(){
     return connectionName;
 }
 
-//wraps listen function and connects to socket, to be called in a thread
-void sockWrapper::serverListen(unsigned short _port){
-
-    //tells listener to listen on _port in args
-    listener.listen(_port);
-
-    //when connection is made pass connection to socket
-    listener.accept(socket);
-
-    //outputs new connection address to console
-    std::cout << "New client connected to " << connectionName << " - " <<socket.getRemoteAddress() << std::endl;
-}
-
 void sockWrapper::send( std::string _message){
 
-    socket.send( _message.c_str(), sizeof(_message.c_str()));
+    _message += '\r';
+    _message += '\0';
+
+    const char* toSend = _message.c_str();
+    socket.send( toSend, strlen(toSend));
 }
 
 void sockWrapper::recieve(){
 
-    char data[1000];
+    char data[1024];
     std::size_t received = 0;
 
     // TCP socket:
     if(socket.receive(data, 1000, received) == sf::Socket::Done){
 
-        data[received] = '\0';
-
         std::string temp;
         temp = ((std::string) data).substr( 0, received);
-        temp += '\0';
-       // messageStack.push(temp);
-        std::cout<< temp + ":P" << std::endl;       
+        temp += '\n';
+        messageStack.push(temp);
+        std::cout<< temp << std::endl;       
     }
 }
 
@@ -77,11 +58,13 @@ void sockWrapper::connect(){
     //and close this socket
     if(socket.getRemotePort() != 0){
 
+        setAlive(true);
+        run.launch();
         std::cout << "connection to " << connectionName <<" completed."<< std::endl;
     }else{
 
         setAlive(false);
-         std::cout << "connection to " << connectionName << " failed." << std::endl;
+        std::cout << "connection to " << connectionName << " failed." << std::endl;
     }
 }
 
@@ -109,6 +92,7 @@ std::string sockWrapper::getMessage(){
 
     if(!messageStack.empty()){
 
+        std::cout << messageStack.size()<<std::endl;
         std::string temp = messageStack.back();
         messageStack.pop();
         return temp;
@@ -140,28 +124,37 @@ void sockWrapper::closeSocket(){
     socket.disconnect();
 }
 
+void sockWrapper::runThread(){
+
+    run.launch();
+}
+
 void sockWrapper::runConnection(){
 
+    while(getAlive()){
 
-    //mutex lock to avoid waste-full spinning
-    mutex.lock();
+        //mutex lock to avoid waste-full spinning
+        mutex.lock();
 
-    if(getToSend()){
+        if(getToSend()){
 
-        send(postMessage());
+            send(postMessage());
 
-        //messageStack.push( getName() + ": " + message);
-        std::cout << getName() + ": " + message<<std::endl;
+            messageStack.push( getName() + ": " + message);
 
-        //sets message back to ""
-        message = "";
+            //sets message back to ""
+            message = "";
 
-        //sets flag to post something back to false
-        setToSend(false);
+            //sets flag to post something back to false
+            setToSend(false);
+        }
+
+        sf::sleep(sf::milliseconds(1));
+
+        recieve();
+
+        //mutex lock to avoid waste-full spinning
+        mutex.unlock();
     }
-
-    sf::sleep(sf::milliseconds(1));
-
-    recieve();
 }
  

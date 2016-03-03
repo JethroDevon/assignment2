@@ -29,17 +29,9 @@ int main(){
     //connection object with timeout passed into args
     Connection connection(1000);
 
-    //add a socket for the connection to handle
-    connection.addSocket("irc", "chat.freenode.net", 6666);
-
-    connection.sendTo("irc", "NICK devonrevenge\r\n");
-    connection.sendTo("irc", "USER woop 8 *: woop\r\n");
-    connection.sendTo("irc", "");
-    connection.sendTo("irc", "");
-    connection.sendTo("irc", "");
-    //connection.sendTo("irc", "JOIN #plusplus\r\n");
-
-
+    //connection.createServer(6677);
+    connection.addSocket("local", "127.0.0.1", 6677);
+   
 
     //main window loop is presently for debugging
      while (window.isOpen()){
@@ -59,14 +51,15 @@ int main(){
 
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return)){
 
-                        connection.sendTo("irc", textField.getText());
-
+                        connection.sendTo( "server", textField.getText());
+                        textBox.addString(textField.getText());
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
 
                         window.close();
+                        connection.killConnection("server");
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)){
 
-                        connection.killConnection("irc");
+                
                     }
 
                     break;
@@ -74,18 +67,12 @@ int main(){
             }
         }
 
-        connection.poll("irc");
 
         //refreshes background
         window.clear(sf::Color::Black);
 
         textField.drawText();
         textBox.drawBox();
-
-        if(connection.dataAvailable("irc")){
-
-            textBox.addString(connection.recieveFrom("irc"));
-        }
 
         textField.keyListen(event);
 
