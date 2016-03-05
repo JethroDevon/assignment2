@@ -29,7 +29,7 @@ int main(){
     //connection object with timeout passed into args
     Connection connection(1000);
 
-      sf::sleep(sf::milliseconds(100));
+    sf::sleep(sf::milliseconds(100));
 
     //connection.createServer(6677);
     connection.addSocket("local", "chat.freenode.net", 6666);

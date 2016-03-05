@@ -20,21 +20,12 @@ std::string sockWrapper::getName(){
 
 void sockWrapper::send( std::string _message){
 
-
-    //protect thread from using stack at wrong time
-    mutex.lock();
     _message += '\0';
     const char* toSend = _message.c_str();
     socket.send( toSend, strlen(toSend));
-
-    //free mutex
-    mutex.unlock();
 }
 
 void sockWrapper::receive(){
-
-    //protect thread from calling receive function at same time
-    mutex.lock();
 
     char data[8000];
     std::size_t received;
@@ -46,14 +37,10 @@ void sockWrapper::receive(){
     }else{
 
         std::string temp;
-        temp = ((std::string) data).substr( 0, received -1);
-            
+        temp = ((std::string) data).substr( 0, received);     
         messageStack.push_back(temp);
         std::cout<< temp << std::endl;
     }
-
-    //free up the mutex
-    mutex.unlock();
 }
 
 //returns size of message stack
@@ -159,8 +146,13 @@ void sockWrapper::runConnection(){
 
         if(getToSend()){
 
+            //protect thread from using stack at wrong time
+            mutex.lock();
             send(postMessage());
-            messageStack.push_back( getName() + ": " + message);
+            //messageStack.push_back( getName() + ": " + message);
+
+            //free mutex
+            mutex.unlock();
 
             //sets message back to ""
             message = "";
@@ -172,7 +164,12 @@ void sockWrapper::runConnection(){
 
         sf::sleep(sf::milliseconds(10));
 
+        //protect receive functions
+        mutex.lock();
         receiveThread.launch();
+
+        //free up lock again
+        mutex.unlock();
     }
 }
  
