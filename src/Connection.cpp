@@ -16,7 +16,7 @@ void Connection::sendTo(std::string _name, std::string _message){
 
     for(auto &socks: socketConnections){
 
-        if(socks->getName().compare( _name)){
+        if(socks->getName() == _name){
 
             //set to send is true, the socket now knows it can post a message as message has been initialised
             socks->setToSend(true);
@@ -32,7 +32,7 @@ std::string Connection::receiveFrom(std::string _name){
 
      for(auto &socks: socketConnections){
 
-        if(socks->getName().compare( _name)){
+        if(socks->getName() == _name){
 
             if(socks->unreadMessages() > 0){
 
@@ -58,7 +58,7 @@ void Connection::killConnection(std::string _name){
         //esle loops until finds name of socket wrapper
         for(auto &socks: socketConnections){
 
-            if(socks->getName().compare( _name)){
+            if(socks->getName() == _name){
 
                 socks->setAlive(false);
                 socks->closeSocket();
@@ -74,7 +74,7 @@ bool Connection::dataAvailable(std::string _name){
 
      for(auto &socks: socketConnections){
 
-        if(socks->getName().compare( _name)){
+        if(socks->getName() == _name){
 
             if((socks->messageStack.size()) > 0 ){
 

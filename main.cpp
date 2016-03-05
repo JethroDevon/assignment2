@@ -13,10 +13,10 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(800, 600), "", false);
 
     //splash uses the window for the splash screen display
-    Splash splash(window, "media/spaceman.png", 4, 8, 2);
+    //Splash splash(window, "media/spaceman.png", 4, 8, 2);
 
     //function in splash can return window to desired size after, should make that auto-matic
-    splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
+    //splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
 
     textOut textBox(20, 20, 600, 400, 20, window);
 
@@ -29,9 +29,13 @@ int main(){
     //connection object with timeout passed into args
     Connection connection(1000);
 
+      sf::sleep(sf::milliseconds(100));
+
     //connection.createServer(6677);
-    connection.addSocket("local", "127.0.0.1", 6677);
-   
+    connection.addSocket("local", "chat.freenode.net", 6666);
+
+    connection.sendTo("local", "NICK revenge\r\nUser mrdv * * :mow mow\r\n" );
+
 
     //main window loop is presently for debugging
      while (window.isOpen()){
@@ -51,12 +55,12 @@ int main(){
 
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return)){
 
-                        connection.sendTo( "server", textField.getText());
+                        connection.sendTo( "local", textField.getText());
                         textBox.addString(textField.getText());
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
 
                         window.close();
-                        connection.killConnection("server");
+                        connection.killConnection("local");
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)){
 
                 
@@ -65,6 +69,11 @@ int main(){
                     break;
 
             }
+        }
+
+        if(connection.dataAvailable("local")){
+
+            textBox.addString(connection.receiveFrom("local"));
         }
 
 

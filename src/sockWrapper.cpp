@@ -2,11 +2,11 @@
 #include <iostream>
 
 //TCP client constructor, first initialiser list arg is directly initialising thread as it cannot have a default constructor
-sockWrapper::sockWrapper(std::string _clientName, std::string _ipAddress, unsigned short _port): run( &sockWrapper::runConnection, this), connectionName( _clientName), IP( _ipAddress), port ( _port){
+sockWrapper::sockWrapper(std::string _clientName, std::string _ipAddress, unsigned short _port): receiveThread( &sockWrapper::receive, this), run( &sockWrapper::runConnection, this), connectionName( _clientName), IP( _ipAddress), port ( _port){
 
     isAlive = false;
     toSend = false;
-    socket.setBlocking(false);
+    socket.setBlocking(true);
 }
 
 sockWrapper::~sockWrapper(){
@@ -20,27 +20,40 @@ std::string sockWrapper::getName(){
 
 void sockWrapper::send( std::string _message){
 
-    _message += '\r';
-    _message += '\0';
 
+    //protect thread from using stack at wrong time
+    mutex.lock();
+    _message += '\0';
     const char* toSend = _message.c_str();
     socket.send( toSend, strlen(toSend));
+
+    //free mutex
+    mutex.unlock();
 }
 
-void sockWrapper::recieve(){
+void sockWrapper::receive(){
 
-    char data[1024];
-    std::size_t received = 0;
+    //protect thread from calling receive function at same time
+    mutex.lock();
+
+    char data[8000];
+    std::size_t received;
 
     // TCP socket:
-    if(socket.receive(data, 1000, received) == sf::Socket::Done){
+    if(socket.receive(data, sizeof(data), received) != sf::Socket::Done){
+
+         
+    }else{
 
         std::string temp;
-        temp = ((std::string) data).substr( 0, received);
-        temp += '\n';
-        messageStack.push(temp);
-        std::cout<< temp << std::endl;       
+        temp = ((std::string) data).substr( 0, received -1);
+            
+        messageStack.push_back(temp);
+        std::cout<< temp << std::endl;
     }
+
+    //free up the mutex
+    mutex.unlock();
 }
 
 //returns size of message stack
@@ -88,15 +101,26 @@ void sockWrapper::setAlive( bool _a){
     isAlive = _a;
 }
 
+//returns last message in stack to application while guarding process with mutex locks
 std::string sockWrapper::getMessage(){
+
+    std::string temp; 
+
+    //mutex avoids change in size of stack while runConnection i
+    mutex.lock();
 
     if(!messageStack.empty()){
 
-        std::cout << messageStack.size()<<std::endl;
-        std::string temp = messageStack.back();
-        messageStack.pop();
+        temp = messageStack.back();
+        messageStack.pop_back();
+        mutex.unlock();
+
         return temp;
     }
+
+    mutex.unlock();
+
+    return "bad message stack protocol, out of range error likley!";
 }
 
 void sockWrapper::setPostMessage(std::string _m){
@@ -133,14 +157,10 @@ void sockWrapper::runConnection(){
 
     while(getAlive()){
 
-        //mutex lock to avoid waste-full spinning
-        mutex.lock();
-
         if(getToSend()){
 
             send(postMessage());
-
-            messageStack.push( getName() + ": " + message);
+            messageStack.push_back( getName() + ": " + message);
 
             //sets message back to ""
             message = "";
@@ -149,12 +169,10 @@ void sockWrapper::runConnection(){
             setToSend(false);
         }
 
-        sf::sleep(sf::milliseconds(1));
 
-        recieve();
+        sf::sleep(sf::milliseconds(10));
 
-        //mutex lock to avoid waste-full spinning
-        mutex.unlock();
+        receiveThread.launch();
     }
 }
  

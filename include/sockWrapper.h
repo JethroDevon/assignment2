@@ -40,7 +40,7 @@ class sockWrapper{
 
         //connect send and receive functions
         void send(std::string);
-        void recieve();
+        void receive();
         void connect();
 
         //set and get port and IP
@@ -65,7 +65,7 @@ class sockWrapper{
 
         void runThread();
 
-        sf::Thread run;
+        sf::Thread receiveThread, run;
 
         //to avoid leaving send and receive functions spinning in their threads
         sf::Mutex mutex;
@@ -74,7 +74,7 @@ class sockWrapper{
         sf::TcpSocket socket;
 
         //will store a stack of strings if messages have been received but not processed
-        std::queue<std::string> messageStack;
+        std::vector<std::string> messageStack;
 
     private:
 
@@ -88,9 +88,6 @@ class sockWrapper{
 
         //will contain port number
         unsigned short port;
-
-        //the size in bytes of a message
-        std::size_t received;
 };
 
 #endif // SOCKWRAPPER_H
