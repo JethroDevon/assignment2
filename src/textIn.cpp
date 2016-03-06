@@ -4,7 +4,7 @@
 ///TO-DO: implement better scrolling so user can go back to what they wrote without deleting
 
 //constructor with button object initialised in initialiser list
-textIn::textIn (int _x, int _y, int _width, int _height, sf::RenderWindow &_rw): Sprites( _rw, "media/cb.bmp") {
+textIn::textIn ( int _x, int _y, int _width, int _height, sf::RenderWindow &_rw): Sprites( _rw, "media/cb.bmp") {
 
     //selected is default false
     setSelected(false);
@@ -29,8 +29,8 @@ textIn::textIn (int _x, int _y, int _width, int _height, sf::RenderWindow &_rw):
 void textIn::setRects(){
 
     //set up colours of text input box
-    rectangle.setFillColor(sf::Color::White);
-    rectangle.setOutlineColor(sf::Color::Black);
+    rectangle.setFillColor(sf::Color::Black);
+    rectangle.setOutlineColor(sf::Color::White);
     rectangle.setOutlineThickness(1);
 
     //position set to draw
@@ -177,7 +177,7 @@ void textIn::caretFront(){
 
 
 //displays the box to draw text in, and the text within it.
-void textIn::drawText(){
+void textIn::drawBox(){
 
     //when called listens for mouse changes
     mouseListen();
@@ -248,7 +248,7 @@ void textIn::addChar(int _c){
     sf::Text temp;
     temp.setFont(font);
     temp.setString( static_cast<char>(_c));
-    temp.setColor(sf::Color::Black);
+    temp.setColor(sf::Color::White);
     temp.setCharacterSize(getHeight());
     text.push_back(temp);
 
@@ -283,7 +283,7 @@ void textIn::insertChar( int _i, int _c){
     //creates a text graphic assigns a font and colour and size and pushes it to back of text vector
     sf::Text temp;
     temp.setFont(font);
-    temp.setColor(sf::Color::Black);
+    temp.setColor(sf::Color::White);
     temp.setCharacterSize(getHeight());
 
     //if char to insert is pesky spacebar character...
@@ -462,14 +462,3 @@ void textIn::resetPositions(){
     }
 }
 
-
-int textIn::getID(){
-
-    return ID;
-}
-
-//sets an id number for text box
-void textIn::setID(int _id){
-
-    ID = _id;
-}

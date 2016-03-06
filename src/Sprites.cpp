@@ -442,4 +442,13 @@ sf::Sprite Sprites::showFrame(){
     return frames[frame];
 }
 
+int Sprites::getID(){
 
+    return ID;
+}
+
+//sets an id number for text box
+void Sprites::setID(int _id){
+
+    ID = _id;
+}

@@ -1,44 +1,81 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include <sstream>
+#include "Sprites.h"
+#include "textIn.h"
+#include "Button.h"
 
-class Gui{
+class GUI{
+
     public:
 
-        Gui();
-        virtual ~Gui();
+        GUI(int , int, sf::RenderWindow &rw);
+        virtual ~GUI();
 
-        //set up a message box with optional buttons
+        //exit button
+        Button closeBut, launchBut;
 
-        //set up an input box with send button, listens for keys
+        //draws gui components
+        void drawComponents();
 
-        //set up an output box with scroll bar
+        //draws gui components
+        void drawLabels();
 
-        //set up tick button with text
+        //this is used to save code repetition in getAddress, Name and Port
+        std::string feildData( int);
 
-        //set up icon button with text
+        //returns address feild data
+        std::string getAddress();
 
-        //set up icon button without text
+        //returns name feild data
+        std::string getName();
 
-        //add option buttons for title bars
+        //returns name feild data
+        std::string getInput();
 
-        //get and set xywh id vars
+        //manages which box is selected, only one can be selected at a time
+        void componentSelection();
 
-        //regex sub program <- loads from a dat folder
+        //listens for keyboard input
+        void inputListen( sf::Event &);
 
-        //gui colour sub program <- saves colour scheme
+        //gets port feild data
+        int getPort();
 
-        //assign static id number
+        //returns addressfeild data
+        void setAddress();
 
-        //get static id number
+        //returns name feild data
+        void setName();
+
+        //gets port feild data
+        void setPort();
+
+        void setInput();
+
+        std::string getType();
 
     private:
 
-        //static colors
+        //keeps screen height and screen width
+        int sheight, swidth;
 
-        //xywh variables
+        //vector type array of sprites for drawring each gui component iterativley, vector is a unique pointer of ancestor
+        //type to gui component, the unique pinter is to avoid object slicing, this is where not enough memory is alocated to each object on the vector but
+        //the code still compiles: http://stackoverflow.com/questions/13091302/stdvector-for-parent-and-child-class
+        std::vector <textIn*> components;
 
-        //static window id
+        //default type is chat client
+        std::string type = "CHATSRV", baddress, bname, input;   
+
+        //stores port number to return
+        int bport;
+
+        //bools to store values of buttons
+        bool launched, closed;
+
+        sf::RenderWindow &rw;
 };
 
 #endif // GUI_H

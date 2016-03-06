@@ -48,7 +48,7 @@ class Connection{
         //creates a new socket and connection and passes it to the array handler
         //overloaded functions are for server then client constructors of sockWrapper
         //respectively
-        void addSocket(std::string, std::string, unsigned short);
+        bool addSocket(std::string, std::string, unsigned short);
 
         //kills connection with same name as args
         void killConnection(std::string);

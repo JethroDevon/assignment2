@@ -21,11 +21,11 @@ Message::Message(sf::RenderWindow &_rw, int _x, int _y, std::string _text, bool 
     }
 
     //prepares the rectangle for the button
-    setRect();
+    setRects();
 }
 
 //prepares a rectangle object to be the message background
-void Message::setRect(){
+void Message::setRects(){
 
     rectangle.setFillColor(sf::Color::White);
     rectangle.setOutlineColor(sf::Color::Black);
@@ -48,7 +48,7 @@ void Message::setRect(){
 }
 
 //draws the message box
-void Message::drawMess(){
+void Message::drawBox(){
 
     //draws rectangle and text
     rw.draw(rectangle);
@@ -60,8 +60,8 @@ void Message::drawMess(){
         //clicking either options box will close the message box however clicking okay
         //will set the boolean called selected to true, clicking either button will set
         //boolean called read to true
-        okay.drawBunt();
-        cancel.drawBunt();
+        okay.drawBox();
+        cancel.drawBox();
 
         //detects button clicks
         if(okay.getSelected())
@@ -71,7 +71,7 @@ void Message::drawMess(){
     }else{
 
         //clicking okay will close the dialogue box, boolean called read will be set to true.
-        okay.drawBunt();
+        okay.drawBox();
 
         //detects button clicks
         if(okay.getSelected())

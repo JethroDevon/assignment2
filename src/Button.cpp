@@ -19,7 +19,7 @@ Button::Button(int _x, int _y, int _w, int _h, std::string _text, sf::RenderWind
     }
 
     //prepares the rectangle for the button
-    setRect();
+    setRects();
 }
 
 //default constructor passes error code image path into sprite extension because will not be using images
@@ -32,20 +32,8 @@ Button::Button(int _x, int _y, int _w, int _h, std::string _text, sf::RenderWind
     setSelected(false);
 }
 
-//gets whether the button is selected
-int Button::getID(){
-
-    return id;
-}
-
-//sets selected to true or false
-void Button::setID(int _id){
-
-    id = _id;
-}
-
 //draw the button
-void Button::drawBunt(){
+void Button::drawBox(){
 
     //detect mouse click
     mouseListen();
@@ -77,19 +65,19 @@ void Button::animateButton(){
     }
 }
 
-void Button::setRect(){
+void Button::setRects(){
 
-    rectangle.setFillColor(sf::Color::White);
-    rectangle.setOutlineColor(sf::Color::Black);
+    rectangle.setFillColor(sf::Color::Black);
+    rectangle.setOutlineColor(sf::Color::White);
     rectangle.setOutlineThickness(1);
     rectangle.setSize(sf::Vector2f(getWidth(), getHeight()));
     rectangle.setPosition(getPosX(), getPosY());
 
-    sftext.setPosition(10+getPosX(), 10+getPosY());
-    sftext.setColor(sf::Color::Black);
+    sftext.setPosition( 10 + getPosX(), 10 + getPosY());
+    sftext.setColor(sf::Color::White);
 
-    //sets text size to be one third of box height
-    sftext.setCharacterSize(1+getHeight()/3);
+    //TEMPORARY - sets text size to be one third of box height
+    sftext.setCharacterSize( 1 + getHeight()/3);
 }
 
 //sets colours for text box, else they are left to default

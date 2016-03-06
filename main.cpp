@@ -6,6 +6,7 @@
 #include "Message.h"
 #include "textIn.h"
 #include "textOut.h"
+#include "GUI.h"
 
 int main(){
 
@@ -18,23 +19,13 @@ int main(){
     //function in splash can return window to desired size after, should make that auto-matic
     //splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
 
-    textOut textBox(20, 20, 600, 400, 20, window);
-
-    textIn textField( 20, 460, 300, 30, window);
-
+    GUI gui( 800, 600, window);
 
     //setting frame rate
-    window.setFramerateLimit(12);
+    window.setFramerateLimit(10);
 
-    //connection object with timeout passed into args
-    Connection connection(1000);
-
-    sf::sleep(sf::milliseconds(100));
-
-    //connection.createServer(6677);
-    connection.addSocket("local", "chat.freenode.net", 6666);
-
-    connection.sendTo("local", "NICK revenge\r\nUser mrdv * * :mow mow\r\n" );
+    //connection object with timeout passed into args, is global for re-use with all application type modes
+    Connection connection(10000);
 
 
     //main window loop is presently for debugging
@@ -44,7 +35,7 @@ int main(){
         while (window.pollEvent(event)){
 
 
-            switch(event.type){
+            switch( event.type){
 
                 case sf::Event::Closed:
 
@@ -55,37 +46,72 @@ int main(){
 
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return)){
 
-                        connection.sendTo( "local", textField.getText());
-                        textBox.addString(textField.getText());
+                        connection.sendTo( gui.getName(), gui.getInput());
+                       
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
 
+                        connection.killConnection(gui.getName());
                         window.close();
-                        connection.killConnection("local");
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)){
 
-                
+                        connection.killConnection(gui.getName());
                     }
 
                     break;
-
             }
         }
 
-        if(connection.dataAvailable("local")){
+        
+        //gui functions are to log user in once launch is set to true, this is so user can log out and then log into
+        //another server or irc channel
+        if( gui.launchBut.getSelected() && gui.getType() == "IRC"){
 
-            textBox.addString(connection.receiveFrom("local"));
+            connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
+
+            //send irc protocol to join chat room at GoldsmithsC++
+            connection.sendTo( gui.getName(), "NICK " + gui.getName() + "\r\nUser C++assignment * * :pap bot\r\nJOIN :#GoldsmithsC++\r\n" );
+
+            //reset launch button to false
+            gui.launchBut.setSelected(false);
+
+        }else if( gui.launchBut.getSelected() && gui.getType() == "CHATSRV"){
+
+            //starts a server and runs the thread
+            connection.createServer(gui.getPort());
+
+             //reset launch button to false
+            gui.launchBut.setSelected(false);
+
+        }else if( gui.launchBut.getSelected() && gui.getType() == "CHATCL"){
+
+            //connects a client and runs a thread unless
+            connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
+
+            gui.launchBut.setSelected(false);
         }
 
-
         //refreshes background
-        window.clear(sf::Color::Black);
+        window.clear( sf::Color::Black);
 
-        textField.drawText();
-        textBox.drawBox();
+        //outputs to the console if data is pushed to the stack
+        if( gui.launchBut.getSelected() && connection.dataAvailable( gui.getName())){
 
-        textField.keyListen(event);
+            //output to console, output box bug is not yet resolved
+            std::cout<< connection.receiveFrom( gui.getName());
+        }
+
+        gui.drawComponents();
+
+        gui.inputListen( event);
 
         //displays everything to draw to the window
         window.display();
+
+        //close window if close button is selected
+        if( gui.closeBut.getSelected()){
+
+            connection.killConnection(gui.getName());
+            window.close();
+        }
      }
 }

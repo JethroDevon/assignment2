@@ -76,7 +76,7 @@ bool Connection::dataAvailable(std::string _name){
 
         if(socks->getName() == _name){
 
-            if((socks->messageStack.size()) > 0 ){
+            if(!socks->messageStack.empty()){
 
                 return true;
             }else{
@@ -140,13 +140,13 @@ void Connection::addServer(){
 
 
 //adds client socket in args to vector
-void Connection::addSocket(std::string _name, std::string _ip, unsigned short _port){
+bool Connection::addSocket(std::string _name, std::string _ip, unsigned short _port){
 
     //adds a new socket to the socket array list with arguments
     socketConnections.push_back(new sockWrapper(_name, _ip,  _port));
 
     //connect the socket to the server
-    socketConnections.back()->connect();
+    return socketConnections.back()->connect();
 }
 
 

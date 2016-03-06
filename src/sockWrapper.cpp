@@ -6,7 +6,7 @@ sockWrapper::sockWrapper(std::string _clientName, std::string _ipAddress, unsign
 
     isAlive = false;
     toSend = false;
-    socket.setBlocking(true);
+    socket.setBlocking(false);
 }
 
 sockWrapper::~sockWrapper(){
@@ -27,19 +27,14 @@ void sockWrapper::send( std::string _message){
 
 void sockWrapper::receive(){
 
-    char data[8000];
-    std::size_t received;
+    std::vector<char> buffer(2000);
+    std::size_t received = 0;
 
     // TCP socket:
-    if(socket.receive(data, sizeof(data), received) != sf::Socket::Done){
+    if(socket.receive(buffer.data(), buffer.size(), received) == sf::Socket::Done) {
 
-         
-    }else{
-
-        std::string temp;
-        temp = ((std::string) data).substr( 0, received);     
-        messageStack.push_back(temp);
-        std::cout<< temp << std::endl;
+        std::string str(buffer.data(), 0, received);
+        messageStack.push_back(str);
     }
 }
 
@@ -49,7 +44,7 @@ int sockWrapper::unreadMessages(){
     return messageStack.size();
 }
 
-void sockWrapper::connect(){
+bool sockWrapper::connect(){
 
     //connect to server
     socket.connect(getIP(), getPort());
@@ -61,10 +56,12 @@ void sockWrapper::connect(){
         setAlive(true);
         run.launch();
         std::cout << "connection to " << connectionName <<" completed."<< std::endl;
+        return true;
     }else{
 
         setAlive(false);
         std::cout << "connection to " << connectionName << " failed." << std::endl;
+        return false;
     }
 }
 
@@ -101,8 +98,8 @@ std::string sockWrapper::getMessage(){
         temp = messageStack.back();
         messageStack.pop_back();
         mutex.unlock();
-
-        return temp;
+        std::cout<< temp <<std::endl;
+        return "floof";
     }
 
     mutex.unlock();
@@ -149,7 +146,9 @@ void sockWrapper::runConnection(){
             //protect thread from using stack at wrong time
             mutex.lock();
             send(postMessage());
-            //messageStack.push_back( getName() + ": " + message);
+
+            messageStack.push_back( getName() + ": " + message);
+            std::cout<< message <<std::endl;
 
             //free mutex
             mutex.unlock();
@@ -161,11 +160,12 @@ void sockWrapper::runConnection(){
             setToSend(false);
         }
 
-
         sf::sleep(sf::milliseconds(10));
 
         //protect receive functions
         mutex.lock();
+
+        //launches thread of thread for one run, this is normally for if socket is blocking
         receiveThread.launch();
 
         //free up lock again

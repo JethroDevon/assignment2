@@ -16,10 +16,10 @@ class Message{
         sf::RenderWindow &rw;
 
         //draws the message box
-        void drawMess();
+        void drawBox();
 
         //prepares message rectangle
-        void setRect();
+        void setRects();
 
         //sets colours for message box, else they are left to default
         void setBorderColor(sf::Color);

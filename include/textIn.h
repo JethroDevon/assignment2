@@ -19,7 +19,7 @@ class textIn: public Sprites{
         std::string send();
 
         //displays the box to draw text in
-        void drawText();
+        void drawBox();
 
         //listens to key presses when selected
         void keyListen(sf::Event &);
@@ -51,12 +51,6 @@ class textIn: public Sprites{
         //removes a sf::Text obecect from vector text at the index num in args
         void removeChar(int);
 
-        //get integer private variable for id number
-        int getID();
-
-        //sets an id number for text box
-        void setID(int);
-
         //for reseting hte caretPositions array and re initialising it with all caret positions
         //on the array
         void resetPositions();
@@ -75,7 +69,7 @@ class textIn: public Sprites{
         //caretX and caretY keep track of where the caret is but do not effect its moving, caret Index stores the
         //position on the string to draw the caret
         bool sendText, withButton;
-        int  ID, caretX, caretY, caretIndex;
+        int caretX, caretY, caretIndex;
 
         //this function returns the distance that the string of texts overlaps the text box, if it doesn't it returns the minus
         //distance

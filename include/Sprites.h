@@ -7,6 +7,7 @@
 #include <vector>
 #include <time.h>
 #include "ImageLoader.h"
+#include <cstdlib>
 
 // The sprite class takes an image on creation, it then slices this image
 // up and adds the sub images in the form of sprites initialized with a texture
@@ -126,6 +127,12 @@ class Sprites{
         //shades the sprite colour at args rgb
         void colorSprite(int, int, int);
 
+        int getID();
+
+        //sets an id number for text box
+        void setID(int);
+
+
         //stores events so new instance does not have to be regularly made each loop
         sf::Event event;
 
@@ -144,7 +151,7 @@ class Sprites{
         std::string path;
 
         //dimensions of the sprite or all frames of the sprite as a whole, this is for collisions or movement
-        int posX, posY, sWidth, sHeight, storedX ,storedY;
+        int ID, posX, posY, sWidth, sHeight, storedX ,storedY;
 
         //colliding if the sprite is colliding with another
         // selected knows if the Sprite has been selected by a mouse click, default false;

@@ -21,8 +21,8 @@ textOut::textOut(int _x, int _y, int _w, int _h, int _fontSize, sf::RenderWindow
 void textOut::setRects(){
 
      //set up colours of text input box
-    box.setFillColor(sf::Color::White);
-    box.setOutlineColor(sf::Color::Black);
+    box.setFillColor(sf::Color::Black);
+    box.setOutlineColor(sf::Color::White);
     box.setOutlineThickness(1);
 
     //position set to draw
@@ -55,7 +55,7 @@ void textOut::addString(std::string _string){
     sf::Text temp;
     temp.setFont(font);
     temp.setString(_string);
-    temp.setColor(sf::Color::Black);
+    temp.setColor(sf::Color::White);
     temp.setCharacterSize(fontSize);
 
     //check that text objects length, if it fits in the box add it to the text array as is
