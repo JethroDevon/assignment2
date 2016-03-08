@@ -421,8 +421,9 @@ std::string textIn::getText(){
     //pulls the caret back
     caretBack();
 
-    //clears the string afterwards so theres nothing on it anymore!
-    text.clear();
+    //unless clearText is set to false clears the string afterwards so theres nothing on it anymore!
+    if(clearText())
+        text.clear();
 
     //returns the string
     return temp;
@@ -462,3 +463,20 @@ void textIn::resetPositions(){
     }
 }
 
+
+//these functions are to change the default behaviour of the text box, normall on get string hte text box clears unless is set otherwise
+bool textIn::clearText(){
+
+    return clear;
+}
+
+void textIn::setClearText( bool _ctext){
+
+    clear = _ctext;
+}
+
+//clears the text for a clean fresh box
+void textIn::clearTextBox(){
+
+    text.clear();
+}

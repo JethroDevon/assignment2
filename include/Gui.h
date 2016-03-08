@@ -56,6 +56,11 @@ class GUI{
 
         std::string getType();
 
+        //calls all setters, used to get feild data before connecting
+        bool setFeildData( bool);
+
+        void clearText();
+
     private:
 
         //keeps screen height and screen width

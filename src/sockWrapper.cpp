@@ -99,7 +99,7 @@ std::string sockWrapper::getMessage(){
         messageStack.pop_back();
         mutex.unlock();
         std::cout<< temp <<std::endl;
-        return "floof";
+        return "-";
     }
 
     mutex.unlock();

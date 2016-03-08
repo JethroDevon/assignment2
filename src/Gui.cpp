@@ -17,13 +17,15 @@ GUI::GUI(int _swidth, int _sheight, sf::RenderWindow & _rw): rw( _rw), swidth( _
 	//temporary solution, pushing textFeilds to vector and naming IDs, 1 is name, 2 is address, 3 is port
 	components.push_back( new textIn( 100, 50, 50, 30, rw));
 	components.back()->setID(1);
+	components.back()->setClearText( false);
 	components.push_back( new textIn( 100, 90, 70, 30, rw));
 	components.back()->setID(2);
+	components.back()->setClearText( false);
 	components.push_back( new textIn( 100, 130, 180, 30, rw));
 	components.back()->setID(3);
+	components.back()->setClearText( false);
 	components.push_back( new textIn( 100, 170, 300, 30, rw));
 	components.back()->setID(4);
-
 }
 
 GUI::~GUI(){
@@ -53,7 +55,7 @@ void GUI::componentSelection(){
 
 	//when the mouse is clicked this function sets all components selected flag to false
 	//unless the mouse is hovering over the box at the time
-	for(auto &s: components){
+	for(auto s: components){
 
 		if (sf::Mouse::isButtonPressed){
 
@@ -84,32 +86,51 @@ std::string GUI::feildData(int _e){
 
 int GUI::getPort(){
 
-	setPort();
 	return bport;
-}
-
-//sts input from input box
-void GUI::setInput(){
-
-	input = feildData(4);
 }
 
 std::string GUI::getName(){
 
-	setName();
 	return bname;
 }
 
 std::string GUI::getInput(){
 
-	setInput();
 	return input;
 }
 
 std::string GUI::getAddress(){
 
-	setAddress();
 	return baddress;
+}
+
+//pass launch button into args, if all feilds are not null then true is returned
+//on click, else false is returned and error is output to console
+bool GUI::setFeildData(bool _getLaunch){
+
+	if(_getLaunch){
+
+	setName();
+	setAddress();
+	setPort();
+
+
+		if( bname == ""){
+
+			std::cout<< "name feild empty." <<std::endl;
+			return false;
+		}if( bport == 0){
+			
+			std::cout<< "port feild empty." <<std::endl;
+			return false;
+		}if( baddress == ""){
+			
+			std::cout<< "address feild empty." <<std::endl;
+			return false;
+		}
+	}
+
+	return _getLaunch;
 }
 
 void GUI::inputListen( sf::Event &_event){
@@ -143,6 +164,13 @@ void GUI::setPort(){
 
 	bport = atoi(feildData(2).c_str());
 }
+
+//sts input from input box
+void GUI::setInput(){
+
+	input = feildData(4);
+}
+
 
 void GUI::drawLabels(){
 

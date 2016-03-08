@@ -27,6 +27,13 @@ class textIn: public Sprites{
         //gets or returns the string 'text'
         std::string getText();
 
+        //these functions are to change the default behaviour of the text box, normall on get string hte text box clears unless is set otherwise
+        bool clearText();
+        void setClearText( bool);
+
+        //clears the texty text box for frexh text receiving
+        void clearTextBox();
+
     private:
 
         //prepares elements in the textbox to be drawn in the right places
@@ -68,7 +75,7 @@ class textIn: public Sprites{
         //send text is true if there is text to send, selected is true if mouse is over the text box when it clicks
         //caretX and caretY keep track of where the caret is but do not effect its moving, caret Index stores the
         //position on the string to draw the caret
-        bool sendText, withButton;
+        bool sendText, withButton, clear;
         int caretX, caretY, caretIndex;
 
         //this function returns the distance that the string of texts overlaps the text box, if it doesn't it returns the minus

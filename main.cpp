@@ -10,6 +10,9 @@
 
 int main(){
 
+    //flag to control connection in connection block of logic
+    bool connectionRunning = false;
+
     // Create the main window
     sf::RenderWindow window(sf::VideoMode(800, 600), "", false);
 
@@ -55,6 +58,12 @@ int main(){
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)){
 
                         connection.killConnection(gui.getName());
+
+                        //false allows connection to be connectable again
+                        connectionRunning = false;
+
+                        //launch button must be set to false again however
+                        gui.launchBut.setSelected(false);
                     }
 
                     break;
@@ -62,39 +71,45 @@ int main(){
         }
 
         
-        //gui functions are to log user in once launch is set to true, this is so user can log out and then log into
-        //another server or irc channel
-        if( gui.launchBut.getSelected() && gui.getType() == "IRC"){
+        if(!connectionRunning){
 
-            connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
+            //gui functions are to log user in once launch is set to true, this is so user can log out and then log into
+            //another server or irc channel
+            if( gui.setFeildData(gui.launchBut.getSelected()) && gui.getType() == "IRC"){
 
-            //send irc protocol to join chat room at GoldsmithsC++
-            connection.sendTo( gui.getName(), "NICK " + gui.getName() + "\r\nUser C++assignment * * :pap bot\r\nJOIN :#GoldsmithsC++\r\n" );
+                connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
 
-            //reset launch button to false
-            gui.launchBut.setSelected(false);
+                //send irc protocol to join chat room at GoldsmithsC++
+                connection.sendTo( gui.getName(), "NICK " + gui.getName() + "\r\nUser C++assignment * * :pap bot\r\nJOIN :#GoldsmithsC++\r\n" );
 
-        }else if( gui.launchBut.getSelected() && gui.getType() == "CHATSRV"){
+                //reset launch button to false
+                gui.launchBut.setSelected(false);
+                connectionRunning = true;
 
-            //starts a server and runs the thread
-            connection.createServer(gui.getPort());
+            }else if( gui.setFeildData(gui.launchBut.getSelected()) && gui.getType() == "CHATSRV"){
 
-             //reset launch button to false
-            gui.launchBut.setSelected(false);
+                //starts a server and runs the thread
+                connection.createServer(gui.getPort());
 
-        }else if( gui.launchBut.getSelected() && gui.getType() == "CHATCL"){
+                 //reset launch button to false
+                gui.launchBut.setSelected(false);
+                connectionRunning = true;
 
-            //connects a client and runs a thread unless
-            connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
+            }else if( gui.setFeildData(gui.launchBut.getSelected()) && gui.getType() == "CHATCL"){
 
-            gui.launchBut.setSelected(false);
+                //connects a client and runs a thread unless
+                connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
+
+                gui.launchBut.setSelected(false);
+                connectionRunning = true;
+            }
         }
 
         //refreshes background
         window.clear( sf::Color::Black);
 
         //outputs to the console if data is pushed to the stack
-        if( gui.launchBut.getSelected() && connection.dataAvailable( gui.getName())){
+        if( gui.setFeildData(gui.launchBut.getSelected()) && connection.dataAvailable( gui.getName())){
 
             //output to console, output box bug is not yet resolved
             std::cout<< connection.receiveFrom( gui.getName());
