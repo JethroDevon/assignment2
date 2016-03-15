@@ -25,7 +25,7 @@ ImageLoader::ImageLoader(std::string _path): errorImage(image){
 
 ImageLoader::~ImageLoader(){
 
-    //delete errorImage;
+    //delete *errorImage;
 }
 
 

@@ -7,9 +7,9 @@ GUI::GUI(int _swidth, int _sheight, sf::RenderWindow & _rw): rw( _rw), swidth( _
 	//magic number is the size of the button plus two pixels so the button is drawn to finish
 	//two pixels of the top right edge, size of buttons is 20 pixel square, launch button is at bottom in middle
 	closeBut( _swidth - 22, 2, 20, 20, "X",  _rw),
-	launchBut( 300, 130, 60, 20, "LAUNCH!", _rw){
+	launchBut( 300, 130, 60, 20, "LAUNCH!", _rw),
+	textbox( 100, 210, 400, 300, 25, _rw){
 
-	
 	///TO-DO: Create array of unique pointers to type sprite and dynamically push these components to it, access
 	//child member functions of vector of unique_pointers to parent class using dynamic_cast<textIn*> (base from auto loop)
 	//if does not return null pointer then access with reference and then call function
@@ -17,15 +17,13 @@ GUI::GUI(int _swidth, int _sheight, sf::RenderWindow & _rw): rw( _rw), swidth( _
 	//temporary solution, pushing textFeilds to vector and naming IDs, 1 is name, 2 is address, 3 is port
 	components.push_back( new textIn( 100, 50, 50, 30, rw));
 	components.back()->setID(1);
-	components.back()->setClearText( false);
 	components.push_back( new textIn( 100, 90, 70, 30, rw));
 	components.back()->setID(2);
-	components.back()->setClearText( false);
 	components.push_back( new textIn( 100, 130, 180, 30, rw));
 	components.back()->setID(3);
-	components.back()->setClearText( false);
 	components.push_back( new textIn( 100, 170, 300, 30, rw));
 	components.back()->setID(4);
+	components.back()->setClearText( true);
 }
 
 GUI::~GUI(){
@@ -43,24 +41,35 @@ void GUI::drawComponents(){
 
 	closeBut.drawBox();
 	launchBut.drawBox();
+	textbox.drawBox();
 
-	for(auto &s: components){
+	if(type == "IRC" || type == "CHATCL"){
+		for(auto &s: components){
 
-			s->drawBox();
+				s->drawBox();
+		}
+	}else if(type == "CHATSRV"){
+
+		for(auto &s: components){
+			if(s->getID() == 2 || s->getID() == 4){
+
+				s->drawBox();
+			}
+		}
 	}
 }
 
-//this function makes sure only one text box is being written in at a time
-void GUI::componentSelection(){
+//this function makes sure only one text box is being written in at a time, argument takes id number of
+//the function selected at the time this is called and deselcts all other boxes with a different id number
+void GUI::componentSelection(int _id){
 
 	//when the mouse is clicked this function sets all components selected flag to false
 	//unless the mouse is hovering over the box at the time
 	for(auto s: components){
 
-		if (sf::Mouse::isButtonPressed){
+		if(_id != s->getID() && !s->mouseOver()){
 
-			if( !s->mouseOver())
-				s->setSelected(false);
+			s->setSelected(false);
 		}
 	}
 }
@@ -91,11 +100,21 @@ int GUI::getPort(){
 
 std::string GUI::getName(){
 
-	return bname;
+	if(type == "CHATSRV"){
+
+		return "server";
+	}else{
+
+		return bname;
+	}
 }
 
 std::string GUI::getInput(){
 
+	//firsts updates string 'input' from textbox
+	setInput();
+
+	//then returns the updated string
 	return input;
 }
 
@@ -108,25 +127,33 @@ std::string GUI::getAddress(){
 //on click, else false is returned and error is output to console
 bool GUI::setFeildData(bool _getLaunch){
 
-	if(_getLaunch){
+	if( _getLaunch){
 
-	setName();
-	setAddress();
-	setPort();
+		setName();
+		setAddress();
+		setPort();
 
+		//if IRC or chat client modes are active then start so long as feilds are filled in
+		if(type == "IRC" || type == "CHATCL"){
+				if( bname == ""){
 
-		if( bname == ""){
-
-			std::cout<< "name feild empty." <<std::endl;
-			return false;
-		}if( bport == 0){
+					return false;
+				}if( bport == 0){
+					
+					return false;
+				}if( baddress == ""){
+					
+					return false;
+				}
 			
-			std::cout<< "port feild empty." <<std::endl;
-			return false;
-		}if( baddress == ""){
-			
-			std::cout<< "address feild empty." <<std::endl;
-			return false;
+
+		//if chat server mode is active then only port feild needs to be filled in
+		}else if(type == "CHATSRV"){
+
+			if( bport == 0){
+					
+				return false;
+			}
 		}
 	}
 
@@ -135,17 +162,12 @@ bool GUI::setFeildData(bool _getLaunch){
 
 void GUI::inputListen( sf::Event &_event){
 
-	if(!launchBut.getSelected()){
+	for(auto &s: components){
 
-		//switches off other selected boxes
-		componentSelection();
+		if(s->getSelected()){
 
-		for(auto &s: components){
-
-			if(s->getSelected()){
-
-				s->keyListen( _event);
-			}
+			s->keyListen( _event);
+			componentSelection(s->getID());
 		}
 	}
 }
@@ -165,7 +187,7 @@ void GUI::setPort(){
 	bport = atoi(feildData(2).c_str());
 }
 
-//sts input from input box
+//sets input from input box
 void GUI::setInput(){
 
 	input = feildData(4);

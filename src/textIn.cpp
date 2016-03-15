@@ -115,7 +115,7 @@ void textIn::keyListen(sf::Event &e){
             if(lastKey == e.text.unicode ){
 
                 //if a second has passed
-                if(getTicks(0.1)){
+                if(getTicks(0.7)){
 
                     //if the caret is next to the front most text object append text to the front of the vector else
                     //insert the character to the point where the caret is colliding
@@ -148,13 +148,13 @@ void textIn::keyListen(sf::Event &e){
 
                 addChar(e.text.unicode);
                 lastKey = e.text.unicode;
-                getTicks(0.08);
+                getTicks(0.03);
 
             }else{
 
                 insertChar(textIndex(), e.text.unicode);
                 lastKey = e.text.unicode;
-                getTicks(0.08);
+                getTicks(0.03);
             }
         }
     }

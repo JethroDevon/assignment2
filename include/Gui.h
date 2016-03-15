@@ -4,6 +4,7 @@
 #include <sstream>
 #include "Sprites.h"
 #include "textIn.h"
+#include "textOut.h"
 #include "Button.h"
 
 class GUI{
@@ -15,6 +16,9 @@ class GUI{
 
         //exit button
         Button closeBut, launchBut;
+
+         //text output
+        textOut textbox;
 
         //draws gui components
         void drawComponents();
@@ -35,7 +39,7 @@ class GUI{
         std::string getInput();
 
         //manages which box is selected, only one can be selected at a time
-        void componentSelection();
+        void componentSelection( int);
 
         //listens for keyboard input
         void inputListen( sf::Event &);

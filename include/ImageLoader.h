@@ -22,6 +22,7 @@ class ImageLoader{
         //error image is initialised in constructor and returned to show a bad image was loaded
         sf::Image &errorImage;
 
+        //string that will be returned
         sf::Image image;
 };
 

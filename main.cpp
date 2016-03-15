@@ -25,11 +25,13 @@ int main(){
     GUI gui( 800, 600, window);
 
     //setting frame rate
-    window.setFramerateLimit(10);
+    window.setFramerateLimit( 10);
+  
+    //faster key press detection
+    window.setKeyRepeatEnabled( false);
 
     //connection object with timeout passed into args, is global for re-use with all application type modes
-    Connection connection(10000);
-
+    Connection connection( 10000);
 
     //main window loop is presently for debugging
      while (window.isOpen()){
@@ -49,6 +51,7 @@ int main(){
 
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return)){
 
+                        //send blank string to send something
                         connection.sendTo( gui.getName(), gui.getInput());
                        
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
@@ -79,28 +82,29 @@ int main(){
 
                 connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
 
-                //send irc protocol to join chat room at GoldsmithsC++
-                connection.sendTo( gui.getName(), "NICK " + gui.getName() + "\r\nUser C++assignment * * :pap bot\r\nJOIN :#GoldsmithsC++\r\n" );
+                //irc protocol requires a short pause before posting connection data
+                sf::sleep(sf::milliseconds(1000));
 
-                //reset launch button to false
-                gui.launchBut.setSelected(false);
+                //send irc protocol to join chat room at GoldsmithsC++
+                connection.sendTo( gui.getName(), "NICK " + gui.getName() + "\r\nUser Cppassignment * * :pap bot\r\nJOIN :#GoldsmithsC++\r\n" );
+
                 connectionRunning = true;
 
             }else if( gui.setFeildData(gui.launchBut.getSelected()) && gui.getType() == "CHATSRV"){
+
+                std::cout<< gui.launchBut.getSelected();
 
                 //starts a server and runs the thread
                 connection.createServer(gui.getPort());
 
                  //reset launch button to false
-                gui.launchBut.setSelected(false);
                 connectionRunning = true;
 
             }else if( gui.setFeildData(gui.launchBut.getSelected()) && gui.getType() == "CHATCL"){
 
                 //connects a client and runs a thread unless
                 connection.addSocket( gui.getName(), gui.getAddress(), gui.getPort());
-
-                gui.launchBut.setSelected(false);
+;
                 connectionRunning = true;
             }
         }
@@ -112,7 +116,20 @@ int main(){
         if( gui.setFeildData(gui.launchBut.getSelected()) && connection.dataAvailable( gui.getName())){
 
             //output to console, output box bug is not yet resolved
-            std::cout<< connection.receiveFrom( gui.getName());
+            std::string temp = connection.receiveFrom( gui.getName());
+
+            std::cout<< temp << std::endl;
+
+            //gui.textbox.addString( temp);
+
+            //if the type of the connection is IRC then
+            if(gui.getType() == "IRC"){
+
+                //gui.papBOTIN( temp);
+
+                // if( gui.papBOTREADY())
+                    // connection.sendTo( gui.getName(), gui.papBOTOUT());
+            }
         }
 
         gui.drawComponents();

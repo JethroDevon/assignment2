@@ -98,8 +98,8 @@ std::string sockWrapper::getMessage(){
         temp = messageStack.back();
         messageStack.pop_back();
         mutex.unlock();
-        std::cout<< temp <<std::endl;
-        return "-";
+        //std::cout<< temp <<std::endl;
+        return temp;
     }
 
     mutex.unlock();
@@ -147,8 +147,8 @@ void sockWrapper::runConnection(){
             mutex.lock();
             send(postMessage());
 
-            messageStack.push_back( getName() + ": " + message);
-            std::cout<< message <<std::endl;
+            messageStack.push_back( message + "\n");
+            //std::cout<< message <<std::endl;
 
             //free mutex
             mutex.unlock();
