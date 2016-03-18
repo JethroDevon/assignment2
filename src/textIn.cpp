@@ -84,6 +84,7 @@ std::string textIn::send(){
  //listens to key presses when selected, records all keyboard input
 void textIn::keyListen(sf::Event &e){
 
+  try{
     //if there are any text objects to cycle through
     if(text.size() != 0){
 
@@ -158,6 +159,13 @@ void textIn::keyListen(sf::Event &e){
             }
         }
     }
+  }catch(...){
+
+    std::cout<< "mystery error in key listen function caught";
+
+    //seems to stabilise mystery eror 75% of the time
+    resetPositions();
+  }
 }
 
 //moves caret to last position in array
@@ -277,50 +285,56 @@ void textIn::addChar(int _c){
 
 void textIn::insertChar( int _i, int _c){
 
-    //creates an iterator for text vector assigned from arg 1
-    auto it = text.begin();
+  try{
 
-    //creates a text graphic assigns a font and colour and size and pushes it to back of text vector
-    sf::Text temp;
-    temp.setFont(font);
-    temp.setColor(sf::Color::White);
-    temp.setCharacterSize(getHeight());
+      //creates an iterator for text vector assigned from arg 1
+      auto it = text.begin();
 
-    //if char to insert is pesky spacebar character...
-    if(_c == 32){
+      //creates a text graphic assigns a font and colour and size and pushes it to back of text vector
+      sf::Text temp;
+      temp.setFont(font);
+      temp.setColor(sf::Color::White);
+      temp.setCharacterSize(getHeight());
 
-        //...then replace it with an underscore, no need to draw that underscore just a space must behave like a character
-        temp.setString("_");
-    }else{
+      //if char to insert is pesky spacebar character...
+      if(_c == 32){
 
-        temp.setString( static_cast<char>(_c));
-    }
+          //...then replace it with an underscore, no need to draw that underscore just a space must behave like a character
+          temp.setString("_");
+      }else{
 
-    if(_i != 0){
+          temp.setString( static_cast<char>(_c));
+      }
 
-        //insert the text in the vector at index using the iterator
-        text.insert(it + _i, temp);
-        text.at(_i).setPosition((text.at(_i ).getPosition().x + text.at(_i ).getLocalBounds().width) , getPosY() - (getHeight()/5));
+      if(_i != 0){
 
-        //iterates all text in front of inserted text to be drawn in front of the char before it (shimmies all the other letters along)
-        for(int x = _i; x < text.size(); x++){
+          //insert the text in the vector at index using the iterator
+          text.insert(it + _i, temp);
+          text.at(_i).setPosition((text.at(_i ).getPosition().x + text.at(_i ).getLocalBounds().width) , getPosY() - (getHeight()/5));
 
-            text.at(x).setPosition((text.at(x -1).getPosition().x + text.at(x -1).getLocalBounds().width) , getPosY() - (getHeight()/5));
-        }
-    }else{
+          //iterates all text in front of inserted text to be drawn in front of the char before it (shimmies all the other letters along)
+          for(int x = _i; x < text.size(); x++){
 
-        //insert the text in the vector at index using the iterator
-        text.insert(it, temp);
+              text.at(x).setPosition((text.at(x -1).getPosition().x + text.at(x -1).getLocalBounds().width) , getPosY() - (getHeight()/5));
+          }
+      }else{
 
-        //sets position of first character to be at front of text box
-        text.at(0).setPosition(getPosX() , getPosY() - - (getHeight()/5));
+          //insert the text in the vector at index using the iterator
+          text.insert(it, temp);
 
-         //iterates all text in front of inserted text to be drawn in front of the char before it (shimmies all the other letters along)
-        for(int x = 1; x < text.size(); x++){
+          //sets position of first character to be at front of text box
+          text.at(0).setPosition(getPosX() , getPosY() - - (getHeight()/5));
 
-            text.at(x).setPosition((text.at(x -1).getPosition().x + text.at(x -1).getLocalBounds().width) , getPosY() - - (getHeight()/5));
-        }
-    }
+           //iterates all text in front of inserted text to be drawn in front of the char before it (shimmies all the other letters along)
+          for(int x = 1; x < text.size(); x++){
+
+              text.at(x).setPosition((text.at(x -1).getPosition().x + text.at(x -1).getLocalBounds().width) , getPosY() - - (getHeight()/5));
+          }
+      }
+  }catch( std::out_of_range){
+
+    std::cout << "range error in textIn";
+  }
 
     //reorganises all positions of text
     resetPositions();
@@ -359,6 +373,7 @@ void textIn::removeChar(){
 //removes char from position in args and changes subsequent objects to be drawn properly
 void textIn::removeChar(int _i){
 
+    try{
     //creates an iterator for text vector assigned from arg 1
     auto it = text.begin();
 
@@ -399,6 +414,10 @@ void textIn::removeChar(int _i){
         //stores the new position of the character at the very front
         caretPosition.push_back(text.at(text.size() -1).getPosition().x +  text.at(text.size() -1).getLocalBounds().width);
     }
+  }catch( std::out_of_range){
+
+    std::cout<< "Range error removing char";
+  }
 }
 
 //gets text from the text graphics vector and returns it as a string also deals with pesky space bar

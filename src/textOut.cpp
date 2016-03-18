@@ -36,6 +36,8 @@ void textOut::setRects(){
 //adds a string to the text array
 void textOut::addString(std::string _string){
 
+  try{
+
     /*THIS WAS THE CAUSE OF A LOT OF CONFUSION FOR ME
 
     /if a new line character is found
@@ -79,6 +81,10 @@ void textOut::addString(std::string _string){
 
             addString(_string.substr(splitIndex));
     }
+  }catch(...){
+
+      std::cout<< "error in text out object";
+  }
 }
 
 void textOut::insertSFText(sf::Text _text){

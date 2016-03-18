@@ -2,6 +2,7 @@
 #define TEXTOUT_H
 
 #include <vector>
+#include <stdexcept>
 #include "Sprites.h"
 
 class textOut: public Sprites{

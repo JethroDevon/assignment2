@@ -5,6 +5,7 @@
 #include "Button.h"
 #include <string>
 #include <vector>
+#include <stdexcept>
 #include "Sprites.h"
 
 //explanation changed
