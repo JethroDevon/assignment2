@@ -36,7 +36,9 @@ void textOut::setRects(){
 //adds a string to the text array
 void textOut::addString(std::string _string){
 
-    //if a new line character is found
+    /*THIS WAS THE CAUSE OF A LOT OF CONFUSION FOR ME
+
+    /if a new line character is found
     std::size_t found = _string.find('\n');
 
     //break up the string, its likely the strings will be broken up by newlines before
@@ -49,7 +51,7 @@ void textOut::addString(std::string _string){
 
         //argument is now initialised with string before the newline character
         _string = _string.substr(0,found);
-    }
+    }*/
 
     //creates a text graphic assigns a font and colour and size
     sf::Text temp;
@@ -137,5 +139,3 @@ int textOut::getFontSize(){
 
     return fontSize;
 }
-
-
