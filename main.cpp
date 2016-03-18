@@ -26,7 +26,7 @@ int main(){
 
     //setting frame rate
     window.setFramerateLimit( 10);
-  
+
     //faster key press detection
     window.setKeyRepeatEnabled( false);
 
@@ -51,29 +51,34 @@ int main(){
 
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return)){
 
-                        //send blank string to send something
-                        connection.sendTo( gui.getName(), gui.getInput());
-                       
+                      std::string temp = gui.getInput();
+
+                      //send temp string from input box to connection wit hname in args1 and
+                      //to the textbos and finally the console
+                      connection.sendTo( gui.getName(), gui.getInput());
+                      gui.textbox.addString(temp);
+                      std::cout << "sending: " << temp << std::endl;
+
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
 
-                        connection.killConnection(gui.getName());
-                        window.close();
+                      connection.killConnection(gui.getName());
+                      window.close();
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)){
 
-                        connection.killConnection(gui.getName());
+                      connection.killConnection(gui.getName());
 
-                        //false allows connection to be connectable again
-                        connectionRunning = false;
+                      //false allows connection to be connectable again
+                      connectionRunning = false;
 
-                        //launch button must be set to false again however
-                        gui.launchBut.setSelected(false);
+                      //launch button must be set to false again however
+                      gui.launchBut.setSelected(false);
                     }
 
                     break;
             }
         }
 
-        
+
         if(!connectionRunning){
 
             //gui functions are to log user in once launch is set to true, this is so user can log out and then log into
@@ -110,7 +115,7 @@ int main(){
         }
 
         //refreshes background
-        window.clear( sf::Color::Black);
+        window.clear( sf::Color::Blue);
 
         //outputs to the console if data is pushed to the stack
         if( gui.setFeildData(gui.launchBut.getSelected()) && connection.dataAvailable( gui.getName())){
@@ -118,9 +123,9 @@ int main(){
             //output to console, output box bug is not yet resolved
             std::string temp = connection.receiveFrom( gui.getName());
 
-            std::cout<< temp << std::endl;
+            std::cout<< "Received: "<< temp;
 
-            //gui.textbox.addString( temp);
+            gui.textbox.addString( temp);
 
             //if the type of the connection is IRC then
             if(gui.getType() == "IRC"){

@@ -88,7 +88,7 @@ void sockWrapper::setAlive( bool _a){
 //returns last message in stack to application while guarding process with mutex locks
 std::string sockWrapper::getMessage(){
 
-    std::string temp; 
+    std::string temp;
 
     //mutex avoids change in size of stack while runConnection i
     mutex.lock();
@@ -148,7 +148,6 @@ void sockWrapper::runConnection(){
             send(postMessage());
 
             messageStack.push_back( message + "\n");
-            //std::cout<< message <<std::endl;
 
             //free mutex
             mutex.unlock();
@@ -172,4 +171,3 @@ void sockWrapper::runConnection(){
         mutex.unlock();
     }
 }
- 
