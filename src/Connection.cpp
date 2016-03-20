@@ -11,6 +11,12 @@ Connection::Connection(float _timeOut): listenThread( &Connection::addServer, th
 
 Connection::~Connection(){
 
+  for(auto &socks : socketConnections){
+
+      //calls destructor in all sockets in socket vector
+      //closing thread loops and
+      delete socks;
+  }
 }
 
 //this function uses the first string args to find the connection to send the message in  string args2
@@ -23,8 +29,8 @@ void Connection::sendTo(std::string _name, std::string _message){
             //set to send is true, the socket now knows it can post a message as message has been initialised
             socks->setToSend(true);
 
-            //post message has been updated, connection now has a message to send, also adds new line escape char
-            socks->setPostMessage(_message+"\n");
+            //post message has been updated, connection now has a message to send
+            socks->setPostMessage(_message);
         }
     }
 }
@@ -116,9 +122,9 @@ std::clock_t Connection::getTicks(){
 void Connection::createServer(unsigned short _port){
 
     port = _port;
-   
+
     if (listener.listen( port) != sf::Socket::Done){
-        
+
         std::cout<<" Couldn't bind to the port: " << port << std::endl;
     }else{
 
@@ -138,7 +144,7 @@ void Connection::addServer(){
 
         //blocks untilll connection is made
         if (listener.accept( socketConnections.back()->socket) == sf::Socket::Done){
-        
+
             std::cout <<" connection made to server."<< std::endl;
             std::cout<< "Total connections: " << socketConnections.size() << std::endl;
             socketConnections.back()->send("Connected.\n");
@@ -164,7 +170,7 @@ std::string Connection::REGEX( std::string _input){
 
     //loops for each vector expressions
     for(auto r: regex){
-    
+
         //gets position of substring
         std::string::size_type i = _input.find(r);
 
@@ -214,7 +220,7 @@ void Connection::addBOTEX( std::string _hear, std::string _say){
 
 //initialises botex with each line from BOTEX.txt
 void Connection::initBOTEX(){
-   
+
     //load up BOTEX.txt data from path that string describes
     std::string bot = stringload.doString("connection/BOTEX.txt");
 
@@ -225,7 +231,7 @@ void Connection::initBOTEX(){
 
     // Process for each line, seperates string and float value and pushes that onto pair stream
     while ( std::getline( stable, temp)) {
- 
+
         //position of comma to size_t
         size_t pos = temp.find("-");
 
@@ -237,7 +243,7 @@ void Connection::initBOTEX(){
 
         //adds expressions to botax map of pairs
         botex[ _first] = temp;
-    }   
+    }
 }
 
 //initialises regex with eachline from REGEX.txt
@@ -255,8 +261,5 @@ void Connection::initREGEX(){
     while ( std::getline( stable, temp)) {
 
         regex.push_back( temp);
-    }   
+    }
 }
-
-
-

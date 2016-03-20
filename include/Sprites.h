@@ -25,6 +25,9 @@ class Sprites{
         //destructor
         virtual ~Sprites();
 
+        //copy constructor
+        Sprites( const Sprites &spr);
+
         //pointer to self for deep copy of base class
         Sprites *sp_copy;
 

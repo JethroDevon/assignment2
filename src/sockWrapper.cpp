@@ -11,6 +11,8 @@ sockWrapper::sockWrapper(std::string _clientName, std::string _ipAddress, unsign
 
 sockWrapper::~sockWrapper(){
 
+      setAlive( false);
+      messageStack.clear();
 }
 
 std::string sockWrapper::getName(){

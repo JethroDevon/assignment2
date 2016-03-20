@@ -55,6 +55,7 @@ Sprites::~Sprites(){
     //error checking string, why you always calling?
     //std::cout<<" a sprite has been destructed"<<std::endl;
     frames.clear();
+    delete sp_copy;
 }
 
 //self destructor for use in emergencies
