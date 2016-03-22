@@ -1,6 +1,6 @@
 #include "GUI.h"
 
-///TO-DO, make font virtual loading function in sprites, have gui objects become the virtual function things demonstrate upcasting 
+///TO-DO, make font virtual loading function in sprites, have gui objects become the virtual function things demonstrate upcasting
 ///makes sprites copyable too
 GUI::GUI(int _swidth, int _sheight, sf::RenderWindow & _rw): rw( _rw), swidth( _swidth), sheight(_sheight),
 
@@ -8,7 +8,7 @@ GUI::GUI(int _swidth, int _sheight, sf::RenderWindow & _rw): rw( _rw), swidth( _
 	//two pixels of the top right edge, size of buttons is 20 pixel square, launch button is at bottom in middle
 	closeBut( _swidth - 22, 2, 20, 20, "X",  _rw),
 	launchBut( 300, 130, 60, 20, "LAUNCH!", _rw),
-	textbox( 100, 210, 400, 300, 25, _rw){
+	textbox( 100, 290, 400, 300, 25, _rw){
 
 	///TO-DO: Create array of unique pointers to type sprite and dynamically push these components to it, access
 	//child member functions of vector of unique_pointers to parent class using dynamic_cast<textIn*> (base from auto loop)
@@ -17,13 +17,17 @@ GUI::GUI(int _swidth, int _sheight, sf::RenderWindow & _rw): rw( _rw), swidth( _
 	//temporary solution, pushing textFeilds to vector and naming IDs, 1 is name, 2 is address, 3 is port
 	components.push_back( new textIn( 100, 50, 50, 30, rw));
 	components.back()->setID(1);
-	components.push_back( new textIn( 100, 90, 70, 30, rw));
+	components.back()->setLabel("NAME");
+	components.push_back( new textIn( 100, 110, 70, 30, rw));
 	components.back()->setID(2);
-	components.push_back( new textIn( 100, 130, 180, 30, rw));
+	components.back()->setLabel("PORT");
+	components.push_back( new textIn( 100, 170, 180, 30, rw));
 	components.back()->setID(3);
-	components.push_back( new textIn( 100, 170, 300, 30, rw));
+	components.back()->setLabel("IP/URL ADDRESS");
+	components.push_back( new textIn( 100, 230, 300, 30, rw));
 	components.back()->setID(4);
 	components.back()->setClearText( true);
+	components.back()->setLabel("Text Input:");
 }
 
 GUI::~GUI(){
@@ -47,6 +51,7 @@ void GUI::drawComponents(){
 		for(auto &s: components){
 
 				s->drawBox();
+				s->drawLabel();
 		}
 	}else if(type == "CHATSRV"){
 
@@ -54,6 +59,7 @@ void GUI::drawComponents(){
 			if(s->getID() == 2 || s->getID() == 4){
 
 				s->drawBox();
+				s->drawLabel();
 			}
 		}
 	}
@@ -86,7 +92,7 @@ std::string GUI::feildData(int _e){
 
 			temp = s->getText();
 		}
-	} 
+	}
 
 	//returns temp string, pointer declasred is also destroyed here
 	return temp;
@@ -139,19 +145,19 @@ bool GUI::setFeildData(bool _getLaunch){
 
 					return false;
 				}if( bport == 0){
-					
+
 					return false;
 				}if( baddress == ""){
-					
+
 					return false;
 				}
-			
+
 
 		//if chat server mode is active then only port feild needs to be filled in
 		}else if(type == "CHATSRV"){
 
 			if( bport == 0){
-					
+
 				return false;
 			}
 		}
@@ -203,4 +209,3 @@ std::string GUI::getType(){
 
 	return type;
 }
-

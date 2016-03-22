@@ -283,6 +283,8 @@ void textIn::addChar(int _c){
     caretIndex++;
 }
 
+
+
 void textIn::insertChar( int _i, int _c){
 
   try{
@@ -420,6 +422,7 @@ void textIn::removeChar(int _i){
   }
 }
 
+
 //gets text from the text graphics vector and returns it as a string also deals with pesky space bar
 std::string textIn::getText(){
 
@@ -482,8 +485,33 @@ void textIn::resetPositions(){
     }
 }
 
+//draws the string in args above the text box
+void textIn::drawLabel(){
 
-//these functions are to change the default behaviour of the text box, normall on get string hte text box clears unless is set otherwise
+  if( labelled){
+    sf::Text temp;
+    temp.setFont(font);
+    temp.setColor(sf::Color::White);
+    temp.setCharacterSize(getHeight());
+    temp.setString(label);
+
+    //draws text just above box
+    temp.setPosition(getPosX() , getPosY() - getHeight());
+
+    //draws the text
+    rw.draw(temp);
+  }
+}
+
+//once a label is set it will always be labelled
+void textIn::setLabel( std::string _label){
+
+  label = _label;
+  labelled = true;
+}
+
+
+//these unctions are to change the default behaviour of the text box, normall on get string hte text box clears unless is set otherwise
 bool textIn::clearText(){
 
     return clear;

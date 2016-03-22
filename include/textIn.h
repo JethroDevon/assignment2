@@ -34,6 +34,9 @@ class textIn: public Sprites{
         //clears the texty text box for frexh text receiving
         void clearTextBox();
 
+        void drawLabel();
+        void setLabel( std::string);
+
     private:
 
         //prepares elements in the textbox to be drawn in the right places
@@ -75,7 +78,7 @@ class textIn: public Sprites{
         //send text is true if there is text to send, selected is true if mouse is over the text box when it clicks
         //caretX and caretY keep track of where the caret is but do not effect its moving, caret Index stores the
         //position on the string to draw the caret
-        bool sendText, withButton, clear;
+        bool sendText, withButton, clear, labelled = false;
         int caretX, caretY, caretIndex;
 
         //this function returns the distance that the string of texts overlaps the text box, if it doesn't it returns the minus
@@ -88,7 +91,7 @@ class textIn: public Sprites{
 
         //name for heading of text input box if needed and text to appear in
         //text box automatically
-        std::string name, initText;
+        std::string name, initText, label;
 
         //stores an array of individual characters, these will be drawn in the form of a
         //sentence but allow the insertion of text

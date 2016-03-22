@@ -63,8 +63,6 @@ class GUI{
         //calls all setters, used to get feild data before connecting
         bool setFeildData( bool);
 
-        void clearText();
-
     private:
 
         //keeps screen height and screen width
@@ -76,7 +74,7 @@ class GUI{
         std::vector <textIn*> components;
 
         //default type is chat client
-        std::string type = "CHATSRV", baddress, bname, input;   
+        std::string type = "CHATCL", baddress, bname, input;
 
         //stores port number to return
         int bport;
