@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include "Sprites.h"
 
-//explanation changed
 class textIn: public Sprites{
 
     public:

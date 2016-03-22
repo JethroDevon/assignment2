@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include "sockWrapper.h"
 #include "Connection.h"
+#include "Substitution.h"
+#include "Ceasar.h"
 #include "Splash.h"
 #include "Button.h"
 #include "Message.h"
@@ -10,6 +12,7 @@
 
 int main(){
 
+
     //flag to control connection in connection block of logic
     bool connectionRunning = false;
 
@@ -17,7 +20,7 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(800, 600), "", false);
 
     //splash uses the window for the splash screen display
-    //Splash splash(window, "media/spaceman.png", 4, 8, 2);
+    Splash splash(window, "media/spaceman.png", 4, 8, 2);
 
     //function in splash can return window to desired size after, should make that auto-matic
     //splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
@@ -126,6 +129,20 @@ int main(){
             std::cout<< "Received: "<< temp;
 
             gui.textbox.addString( temp);
+
+            //this block demonstrates two dencryption objects functioning when a command is sent to them
+            if( temp.substr( 0, 7) == "@CEASAR:"){
+
+              std::cout<<" attempting to decrypt ceasar cipher now, please wait a moment or two...";
+              Ceasar cipher(temp.substr( 8));
+            }
+
+            if( temp.substr( 0, 10) == "@FREQUENCY:"){
+
+              std::cout<<" attempting to decrypt ceasar cipher now, please wait a moment or two...";
+              Ceasar cipher(temp.substr( 11));
+            }
+
 
             //if the type of the connection is IRC then
             if(gui.getType() == "IRC"){
