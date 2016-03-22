@@ -23,7 +23,7 @@ int main(){
     Splash splash(window, "media/spaceman.png", 4, 8, 2);
 
     //function in splash can return window to desired size after, should make that auto-matic
-    //splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
+    splash.returnWindow(800 , 600, "PAP c++ Assignment 2");
 
     GUI gui( 800, 600, window);
 
@@ -47,6 +47,7 @@ int main(){
 
                 case sf::Event::Closed:
 
+                    connection.listening = false;
                     window.close();
                     break;
 
@@ -65,6 +66,7 @@ int main(){
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)){
 
                       connection.killConnection(gui.getName());
+                      connection.listening = false;
                       window.close();
                     }else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Num0)){
 
@@ -126,21 +128,21 @@ int main(){
             //output to console, output box bug is not yet resolved
             std::string temp = connection.receiveFrom( gui.getName());
 
-            std::cout<< "Received: "<< temp;
+            std::cout<< temp.substr( 0, 7);
 
             gui.textbox.addString( temp);
 
             //this block demonstrates two dencryption objects functioning when a command is sent to them
-            if( temp.substr( 0, 7) == "@CEASAR:"){
+            if( temp.substr( 0, 8) == "@CEASAR:"){
 
               std::cout<<" attempting to decrypt ceasar cipher now, please wait a moment or two...";
               Ceasar cipher(temp.substr( 8));
             }
 
-            if( temp.substr( 0, 10) == "@FREQUENCY:"){
+            if( temp.substr( 0, 11) == "@FREQUENCY:"){
 
               std::cout<<" attempting to decrypt ceasar cipher now, please wait a moment or two...";
-              Ceasar cipher(temp.substr( 11));
+              Ceasar cipher(temp.substr( 12));
             }
 
 
@@ -168,4 +170,6 @@ int main(){
             window.close();
         }
      }
+
+       connection.listening = false;//just doubly sure
 }

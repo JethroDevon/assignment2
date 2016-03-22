@@ -13,7 +13,7 @@
      off the stack
 
      Regular expressions are deleted with regex, expressions can be added with addREGEX().
-     BOTEX() listens for key strings in data sent to a connection in connections, a reply to send the 
+     BOTEX() listens for key strings in data sent to a connection in connections, a reply to send the
      //connection is sent in the next string
 
      THIS CLASS MUST ALWAYS HAVE A FOLDER CALLED connection, IN IT THE .txt FILES REGEX and BOTEX must exist
@@ -28,7 +28,7 @@
 #include <vector>
 #include <time.h>
 #include <sstream>
-#include <stdlib.h> 
+#include <stdlib.h>
 
 class Connection{
 
@@ -61,6 +61,8 @@ class Connection{
 
         //kills connection with same name as args
         void killConnection( std::string);
+
+        bool listening;
 
     private:
 
@@ -110,8 +112,6 @@ class Connection{
         std::clock_t ticks;
 
         float timeOut;
-
-        bool listening;
 
         //to avoid adding a thread to the vector as its being used
         sf::Mutex mutex;

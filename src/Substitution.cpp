@@ -2,11 +2,16 @@
 
 Substitution::Substitution(std::string _path){
 
-    //gets the cipher from the file in args
-    getCipherFromFile(_path);
 
-    //initialised empty
-	solvedString = "";
+    //gets the cipher from the file in args
+    getCipher( stringload.doString( _path));
+
+    //initialise a dictionary of a thousand of the most common words
+    initDictionary( stringload.doString( "char_frequencies/dictionary.txt"));
+
+    //string in constructor may have lots of spaces in, this will help identify
+    //possible words if the sentence still has its structure
+    initCipherArray();
 
     //adds the symbols to a vector called symbols to store and perform operations on
     storeSymbols();
@@ -17,28 +22,68 @@ Substitution::Substitution(std::string _path){
     //finds the relative frequency of each character in the whole string
     relativeFrequency();
 
-    //initialise a list of combination of common combinations
-    initialiseCombination(4);
+    //initialise a list of common combination in cipher
+    initialiseCombination(20);
 
-     //shows frequency of characters appearance
-    showFrequencyTable();
+    //initialise list possible common words in cipher
+    initialiseWords(30);
+}
 
-    std::cout<<"\n\n"<<solveFrequency();
+ Substitution::~Substitution(){
 
+   cipherArray.clear();
+   RFoSL.clear();
+   RFoL.clear();
+   keyMap.clear();
+   commonPairs.clear();
+   commonWords.clear();
+   commonCombinations.clear();
+  }
+
+void Substitution::initDictionary( std::string _dictionary){
+
+  //create input string stream to manage line by line feed from frequency table
+  std::istringstream dstream( _dictionary);
+
+  std::string temp;
+
+  // Process for each line, seperates string and float value and pushes that onto pair stream
+  while ( std::getline( dstream, temp)) {
+
+    //init dictionary vector
+    dictionary.push_back( temp);
+  }
+}
+
+//returns a percentage of wordsin cipherArray that were found on the dictionary of 1000 most common words
+float Substitution::dictionaryQuotient(){
+
+  float found = 0;
+
+  for( std::string c : cipherArray){
+    for( std::string d : dictionary){
+
+      if( c == d){
+
+        found++;
+        break;
+      }
+    }
+  }
+
+  return  found / cipherArray.size() * 100;
 }
 
 //takes path to a .txt with the cipher text on and initialises the variable cipher on it
-void Substitution::getCipherFromFile(std::string _path){
+void Substitution::getCipher(std::string _fileText){
 
-    
-    //removes spaces
-    cipher.erase(remove_if(cipher.begin(), cipher.end(), isspace),cipher.end());
+    cipher = _fileText;
 
     //transforms all text to lower case
-	std::transform(cipher.begin(), cipher.end(), cipher.begin(), tolower);
+ 	  std::transform(cipher.begin(), cipher.end(), cipher.begin(), tolower);
 
     //removes a couple of awkward characters
-    char chars[]= "/;!";
+    char chars[]= "!\n\r'-1234567890";
     for (unsigned int i = 0; i < 3; ++i){
 
             cipher.erase(std::remove(cipher.begin(),cipher.end(),chars[i]),cipher.end());
@@ -53,6 +98,35 @@ void Substitution::showKeyMap(){
     }
 }
 
+void Substitution::initCipherArray(){
+
+  cipherArray.clear();
+
+  //temp string for storing words
+  std::string temp;
+
+  //for each character or symbol in the cipher string
+  for( int c = 0; c < cipher.size(); c++){
+
+  //clear temp
+  temp = "";
+
+    //loop untill encounter space or end of file
+    for( c ; c < cipher.size(); c++){
+
+      temp += cipher[c];
+      if( cipher[c] == ' '){
+
+        break;
+      }
+    }
+
+    //removes spaces
+    temp.erase( remove_if( temp.begin(), temp.end(), isspace), temp.end());
+    cipherArray.push_back( temp);
+  }
+}
+
 void Substitution::storeSymbols(){
 
     //for each character or symbol in the cipher string
@@ -64,11 +138,12 @@ void Substitution::storeSymbols(){
         //check if the character or symbol has been encountered before
         for(auto  sym: symbols){
 
-            if(sym == c){
+            if(sym == c && c != ' '){
 
                 newSymbol = false;
             }
         }
+
         //pushes new symbol to vector list
         if(newSymbol){
 
@@ -77,36 +152,35 @@ void Substitution::storeSymbols(){
     }
 }
 
-//initialises the values that belong to RFoL, shows the frequency each character is used relative to the others
+//initilaises the Rofl array, this is initialise the array needed to analyse frequencies of use of characters
 void Substitution::initialiseRFoL(){
 
-	//initialising RFoL.push_back(std::pair<char,float>(s elements to be the character mapped to how often it occures relativley
-	RFoL.push_back(std::pair<char,float>('a', 8.167));
-	RFoL.push_back(std::pair<char,float>('b', 1.492));
-	RFoL.push_back(std::pair<char,float>('c', 2.782));
-	RFoL.push_back(std::pair<char,float>('d', 4.253));
-	RFoL.push_back(std::pair<char,float>('e', 12.702));
-	RFoL.push_back(std::pair<char,float>('f', 2.228));
-	RFoL.push_back(std::pair<char,float>('g', 2.015));
-	RFoL.push_back(std::pair<char,float>('h', 6.094));
-	RFoL.push_back(std::pair<char,float>('i', 6.996));
-	RFoL.push_back(std::pair<char,float>('j', 0.153));
-	RFoL.push_back(std::pair<char,float>('k', 0.772));
-	RFoL.push_back(std::pair<char,float>('l', 4.025));
-	RFoL.push_back(std::pair<char,float>('m', 2.406));
-	RFoL.push_back(std::pair<char,float>('n', 6.749));
-	RFoL.push_back(std::pair<char,float>('o', 7.507));
-	RFoL.push_back(std::pair<char,float>('p', 1.929));
-	RFoL.push_back(std::pair<char,float>('q', 0.095));
-	RFoL.push_back(std::pair<char,float>('r', 5.987));
-	RFoL.push_back(std::pair<char,float>('s', 6.327));
-	RFoL.push_back(std::pair<char,float>('t', 9.056));
-	RFoL.push_back(std::pair<char,float>('u', 2.758));
-	RFoL.push_back(std::pair<char,float>('v', 0.978));
-	RFoL.push_back(std::pair<char,float>('w', 2.360));
-	RFoL.push_back(std::pair<char,float>('x', 0.150));
-	RFoL.push_back(std::pair<char,float>('y', 1.974));
-	RFoL.push_back(std::pair<char,float>('z', 0.074));
+    //load up frequency table at path
+    std::string frequencyTable = stringload.doString("char_frequencies/br.txt");
+
+    //create input string stream to manage line by line feed from frequency table
+    std::istringstream stable( frequencyTable);
+
+    std::string temp;
+
+    // Process for each line, seperates string and float value and pushes that onto pair stream
+    while ( std::getline( stable, temp)) {
+
+        //position of comma to size_t
+        size_t pos = temp.find(",");
+
+        //get char at pos 0 of this string
+        char c = temp.at( 0);
+
+        //get substring from pos to end of line, this contains string of a float
+        temp = temp.substr( pos + 1);
+
+        //converts the string to a float
+        float f = atof( temp.c_str());
+
+	    //initialising RFoL.push_back(std::pair<char,float>(s elements to be the character mapped to how often it occures relativley
+	    RFoL.push_back(std::pair<char,float>( c, f));
+    }
 }
 
 //this function calculates the relative frequency of a character in cipher text
@@ -124,9 +198,10 @@ void Substitution::relativeFrequency(){
         //for each character in the cipher text store the  frequency of occurrence in RFoSL
         for(char s: cipher){
 
-            if(c == s){
+            if(c == s && s != ' '){
 
                 tempFirst++;
+
             }
         }
 
@@ -151,7 +226,7 @@ void Substitution::showFrequencyTable(){
     for(size_t K = 0; K < std::min(RFoL.size(), RFoSL.size()); ++K){
 
         //outputs order of occurrence of each string, shows which keys are likely to be substituted for which others
-        std::cout<< RFoL[K].first<< " -  SUBSTITUTED FOR: "<< RFoSL[K].first <<std::endl;
+        std::cout<< keyMap[K].first<< " -  SUBSTITUTED FOR: "<< keyMap[K].second <<std::endl;
 
         //subtracts the frequency of occurrence of the substituted letters from the frequency of letters used in
         //English plain text and later returns the absolute value so the user can see how close the cipher is, a
@@ -159,7 +234,15 @@ void Substitution::showFrequencyTable(){
         errorRatio += abs(RFoSL[K].second - RFoL[K].second);
     }
 
-    std::cout<< "\n\nError of cipher to frequency of English plain text is: " << errorRatio << ".\n Most common combinations of characters:\n" <<std::endl;
+    std::cout<< "\n\nError of cipher to frequency of English plain text is: " << errorRatio << ".\n\n Most common possible words:\n" <<std::endl;
+
+    //shows frequency of most common combinations
+    for(auto a: commonWords){
+
+        std::cout<< a <<std::endl;
+    }
+
+    std::cout<< "\n Most common occurances of combinations that may not be words:\n" <<std::endl;
 
     //shows frequency of most common combinations
     for(auto a: commonCombinations){
@@ -174,6 +257,8 @@ void Substitution::showFrequencyTable(){
 
         std::cout<< a <<std::endl;
     }
+
+    std::cout<<"\n frequency of common words found: " << dictionaryQuotient() << " percent."<<std::endl;
 }
 
 //this function sorts both vectors of pairs into descending order based on the second value of each pair
@@ -200,24 +285,42 @@ void Substitution::sortVectors(){
 
 //once the vectors are sorted the characters from one list
 //are similarly
-char Substitution::switchChar(char _substitute){
+char Substitution::switchChar( char _substitute){
 
     //returns second value if first matches
     for(auto km: keyMap){
 
-        if( km.first == _substitute){
+        if( km.second == _substitute){
+
+            return km.first;
+        }
+    }
+
+    //if nothing is found to perform switch return ' ', most likley it can
+    //point out there are symbols that should not be present
+    return ' ';
+}
+
+//the input at args is the key, returns the value for the key or the letter the key has been substituted for
+char Substitution::getValue( char _key){
+
+    //loops for each pair
+    for(auto km: keyMap){
+
+        //if the first value matches args then return second
+        if( km.first == _key){
 
             return km.second;
         }
     }
 
-    //if nothing is found to perform switch return '!', most likley it can
+    //if nothing is found to perform switch return ' ', most likley it can
     //point out there are symbols that should not be present
-    return '!';
+    return ' ';
 }
 
 //finds the number of occurrences of the combination in args
-int Substitution::addCombination(std::string _combination){
+int Substitution::addCombination( std::string _combination){
 
     int count = 0;
     size_t nPos = cipher.find(_combination, 0);
@@ -231,7 +334,7 @@ int Substitution::addCombination(std::string _combination){
 
 //this function returns the most common combination of characters that
 //appear together in cipher that are not on the commonCombinations vector
-std::string Substitution::maxNCombination(int _size){
+std::string Substitution::maxNCombination( int _size){
 
     //empty temporary string for storing most common combination
     std::string mostCommon = "";
@@ -245,7 +348,14 @@ std::string Substitution::maxNCombination(int _size){
     //for each char in the cipher
     for(int c = 0; (c + _size) < cipher.size(); c++){
 
-        tempCombinations.push_back(cipher.substr( c, _size));
+
+        std::string temp = cipher.substr( c, _size);
+
+        //if there are no spaces
+        if( !(temp.find(" ") != std::string::npos)){
+
+          tempCombinations.push_back(temp);
+        }
     }
 
     /*the following logic uses two loops and flags to detect the most common occurrences of string combinations
@@ -283,53 +393,139 @@ std::string Substitution::maxNCombination(int _size){
 //five characters for the number of times passed in args
 void Substitution::initialiseCombination(int _size){
 
-    //searches for the 4 most common combinations for up to _size characters
-    for(int a = 2; a <= _size; a++){
-        for(int f = 0; f <= 6; f++){
+  //searches for the 4 most common combinations for up to _size characters
+  for(int a = 2; a <= _size; a++){
+    for(int f = 0; f <= 8; f++){
 
-            commonCombinations.push_back(maxNCombination(a));
-        }
+      commonCombinations.push_back( maxNCombination( a));
     }
+  }
 
-        int highestPair = 0;
+  int highestPair = 0;
 
-        for(auto k: keyMap){
+  for(auto k: keyMap){
 
-            std::string temp = "";
-            temp += k.first;
-            temp += k.first;
+    std::string temp = "";
+    temp += k.first;
+    temp += k.first;
 
-            if((addCombination(temp) > highestPair) && !findPairs(temp)){
+    //adds all combinations of two symbols together so long as they appear on
+    //on an a relative size amount of times to the ciphers size, for now 3 is a debugging amount
+    //as I do not want to over optimise for spaces being available, this is because  Iwill use
+    //an algorithm to find common frases and therefore patterns to create spaces to work with
+    if(( addCombination(temp) > 3) && !findPairs(temp)){
 
-                highestPair = addCombination(temp);
-                commonPairs.push_back(temp);
-                std::cout<<temp<<" ";
-            }
-        }
+      commonPairs.push_back(temp);
+    }
+  }
+}
+
+//initialise commonCombinations array with the '_size' amount highest occuring words
+void Substitution::initialiseWords( int _size){
+
+  for(int f = 0; f <= _size; f++){
+
+      commonWords.push_back( maxNWords());
+  }
+
+  for( std::string c : commonWords){
+    for(int f = 0; f < commonCombinations.size(); f++){
+
+      //removes a word from a combination, the differences is one is maybe a word the other is maybe
+      //a common part of a word
+      if( c == commonCombinations.at(f))
+        commonCombinations.erase( commonCombinations.begin() + f);
+    }
+  }
+}
+
+//this function finds common words, that is combinations between spaces, it then removes the words that are found from the combinations
+//this is so that a frequency solve can tell lettrs that are common like th and sh from words that are common like at and in
+//help again with http://stackoverflow.com/questions/11130243/remove-if-string-matches-a-given-string-in-a-set
+std::string Substitution::maxNWords(){
+
+  //temps tring for returning as the most common
+  std::string temp;
+
+  //stores the highest yet number of occurrences
+  int highestOccurrences = 0;
+
+  //loops cipherArrays words
+  for(auto c: cipherArray){
+
+      //stores the number of occurrences
+      int occurances = 0;
+
+      //loops for cipherArray again to find matches
+      for(auto t: cipherArray){
+
+          //if the strings are equal and not on the commonWords list rack up occurrences
+          if(c == t && !findWords(c)){
+
+              occurances++;
+          }
+      }
+
+      if( occurances > highestOccurrences){
+
+        highestOccurrences = occurances;
+        temp = c;
+      }
+  }
+
+  return temp;
 }
 
 //this function switches the places of two substituted characters mapped to pairs, that is the places
 //of two second characters in keyMap, this is so changes can be made when solving
-void Substitution::switchSubstitutes(char _swapA, char _swapB){
+void Substitution::switchKeys(char _swapA, char _swapB){
 
-    //stores positions in vector
-    size_t Apos, Bpos;
+    size_t L;
 
     //loops for keyMap
-    for(size_t K = 0; K < keyMap.size(); ++K){
+    for(size_t K = 0; K < keyMap.size(); K++){
 
         if(keyMap[K].first == _swapA){
 
-            Apos = K;
-        }
-        if(keyMap[K].first == _swapB){
-
-            Bpos = K;
+          keyMap[K].first = _swapB;
+          L = K;
         }
     }
+    //loops for keyMap
+    for(size_t K = 0; K < keyMap.size(); K++){
 
-    keyMap[Apos].first = _swapB;
-    keyMap[Bpos].first = _swapA;
+        if(keyMap[K].first == _swapB && L != K){
+
+          keyMap[K].first = _swapA;
+        }
+    }
+}
+
+//this function will switch the keys to fit a desired value so that if 'z' value was 'e'
+//but it is returning 't' then the first arg would be 'z' and the second arg would 't'
+//the key for the value 'e' will also be switched to what 't' had.
+//'KVP' in this case stands for 'KeyValuePair'
+void Substitution::swapKVP(char _key, char _value){
+
+  char otherKey;
+  char switchedVal = switchChar( _key);
+
+  for( auto & km: keyMap){
+
+    if( km.first == _value){
+
+        otherKey = km.second;
+        km.first = switchedVal;
+    }
+  }
+
+  for( auto & km: keyMap){
+
+    if( km.second == _key){
+
+        km.first = _value;
+    }
+  }
 }
 
 //this function returns true or false if the string in args is actually on the vector container
@@ -339,6 +535,20 @@ bool Substitution::findCombination(std::string _find){
 
         if(o == _find)
             return true;
+    }
+
+    return false;
+}
+
+//this function returns true or false if the string in args is actually on the vector container
+bool Substitution::findWords( std::string _find){
+
+    for(std::string o: commonWords){
+
+        if(o == _find){
+
+            return true;
+        }
     }
 
     return false;
@@ -356,14 +566,146 @@ bool Substitution::findPairs(std::string _find){
     return false;
 }
 
+void Substitution::updateCipher(){
+
+  solvedString = "";
+
+  for(auto c: cipher){
+
+       solvedString += switchChar(c);
+   }
+
+   initCipherArray();
+
+   //output new level of accuracy to console
+   std::cout<< "accuracy is now : "<< dictionaryQuotient() <<std::endl;
+}
+
 //this function checks the frequency of each chars frequency occurrence to others until
-//the frequency that is most similar to the table is found, then
-std::string Substitution::solveFrequency(){
+//the frequency that is most similar to the table is found
+std::string Substitution::solve(){
 
-    for(auto c: cipher){
+  //the most common word should be the word 'the' and it would be near the top of the most common words
+  //found, this loop will loop the 'commonWord' array untill a the first three letter word comes up
+  //e haasn't been switched yet however, this is because it should have been found other wise the whole
+  //frequency search would be too badly flawed
+  for( int s = 0; s < commonWords.size(); s++){
+    if( commonWords.at(s).size() == 3){
 
-        solvedString += switchChar(c);
+      std::string temp = commonWords.at(s);
+
+      //could make this block of logic more efficient but I believe it is better for it to remain readable
+      char the1 =  temp.at(0);
+      char the2 =  temp.at(1);
+
+      swapKVP( the1, 't');
+      swapKVP( the2, 'h');
+
+      break;
     }
+  }
 
-    return solvedString;
+  //only 'i' and 'a' will be on their own, the outer loop, loops twice to check if one of the two
+  // often occures between 'th' and 't'
+  for( int v = 0; v < commonWords.size(); v++){
+    if( commonWords.at(v).size() == 1){
+
+
+      for( int s = 0; s < commonWords.size(); s++){
+        if( commonWords.at(s).size() == 4){
+
+          //make the word 'that' up out of 'th' - the lone vowel 'i' or 'a' and then 't'
+          //therefore if 'that' is found make sure that the third char is forced to be the
+          //substitute for 'a'.
+          //...ugly code however this is readable and only called once
+          std::string temp = commonWords.at(s);
+          std::string vowel = commonWords.at(v);
+          char that1 = temp.at(0);
+          char that2 = temp.at(1);
+          char that3 = temp.at(2);
+          char that4 = temp.at(3);
+
+          if( 't' == switchChar(that1) && ( that1 == that4) && 'h' == switchChar(that2)){
+
+              swapKVP( that3, 'a');
+          }
+        }
+      }
+    }
+  }
+
+  //now 'a' is found 'i' has been isolated, its the only other singular word
+  for( int v = 0; v < commonWords.size(); v++){
+    if( commonWords.at(v).size() == 1){
+
+      if( findWords( commonWords.at(v)) && ('a' != switchChar(commonWords.at(v).at(0)) )){
+
+        swapKVP( commonWords.at(v).at(0), 'i');
+        break;
+      }
+    }
+  }
+
+  //remaining vowels are 'o' and 'u', this block will find 'o'
+  for( int v = 0; v < commonWords.size(); v++){
+    if( commonWords.at(v).size() == 2){
+
+      std::string TO = commonWords.at(v);
+
+      if( findWords(TO) && 't' == switchChar( TO.at(0))){
+
+          swapKVP( TO.at(1), 'o');
+      }
+    }
+  }
+
+  //'ll' is a good word to search for now because 'a' has been found, there ar no other common combinations that start with a and have
+  //two other letters infront that appear often enough
+  for( int v = 0; v < commonWords.size(); v++){
+      if( commonWords.at(v).size() == 3){
+
+        std::string temp = commonWords.at(v);
+        if( 'a' == switchChar(temp.at(0)) && findPairs(std::string{ temp.at(1), temp.at(2)})){
+
+          swapKVP( temp.at(1), 'l');
+        }
+      }
+  }
+
+
+  //'s' is a good word to go for now, 'is' is very common as is 'as', 'sh' is a common
+  //word combination too, as is a word but it is a more common combination most
+  //general words can be used now too
+  for(auto WAS: commonWords){
+   if( WAS.size() == 3){
+     for( auto SH: commonCombinations ){
+       if( SH.size() == 2 &&  'h' == switchChar(SH.at(1))){
+         for(auto IS: cipherArray){
+           if( IS.size() == 2 && findWords( IS)){
+
+             if( 'a' == switchChar(WAS.at(1)) && (WAS.at(2) == SH.at(0)) && 'i' == switchChar(IS.at(0))){
+
+              //if all of those have those chars in then there 'has' to be an 's' there
+              swapKVP(WAS.at(2), 's');
+              swapKVP(WAS.at(0), 'w');
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+
+
+
+
+
+
+  //'w' is a good letter to go for now, 'll' is a common pair and 'i' has been found so it may expose 'will'
+  //'e' has been found to expose 'we' and also 'with' is possible
+
+
+  updateCipher();
+
+  return solvedString;
 }
